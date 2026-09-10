@@ -1,0 +1,58 @@
+[
+  {
+    "id": "torsten",
+    "source": {
+      "x": 67,
+      "y": 26,
+      "w": 853,
+      "h": 1463
+    },
+    "x": 500,
+    "y": 224,
+    "height": 424,
+    "file": "hero-torsten.png",
+    "visiblePixels": 465790
+  },
+  {
+    "id": "nico",
+    "source": {
+      "x": 86,
+      "y": 17,
+      "w": 874,
+      "h": 1466
+    },
+    "x": 762,
+    "y": 164,
+    "height": 455,
+    "file": "hero-nico.png",
+    "visiblePixels": 525982
+  },
+  {
+    "id": "stefan",
+    "source": {
+      "x": 111,
+      "y": 38,
+      "w": 808,
+      "h": 1444
+    },
+    "x": 976,
+    "y": 185,
+    "height": 447,
+    "file": "hero-stefan.png",
+    "visiblePixels": 493283
+  },
+  {
+    "id": "andreas",
+    "source": {
+      "x": 93,
+      "y": 18,
+      "w": 1398,
+      "h": 999
+    },
+    "x": 715,
+    "y": 292,
+    "height": 390,
+    "file": "hero-andreas.png",
+    "visiblePixels": 611321
+  }
+]

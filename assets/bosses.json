@@ -1,0 +1,241 @@
+{
+  "file": "bosses.png",
+  "width": 1254,
+  "height": 1254,
+  "columns": 4,
+  "rowsCount": 4,
+  "cellWidth": 313.5,
+  "cellHeight": 313.5,
+  "facing": "right",
+  "alpha": true,
+  "characters": {
+    "enforcer": {
+      "row": 0,
+      "frames": [
+        {
+          "name": "idle",
+          "bounds": {
+            "x": 41.0,
+            "y": 9.0,
+            "w": 244,
+            "h": 307
+          },
+          "transparentPixels": 57325,
+          "visiblePixels": 36412,
+          "borderVisiblePixels": 30,
+          "componentVerified": true
+        },
+        {
+          "name": "walk",
+          "bounds": {
+            "x": 46.5,
+            "y": 8.0,
+            "w": 234,
+            "h": 305
+          },
+          "transparentPixels": 62614,
+          "visiblePixels": 30547,
+          "borderVisiblePixels": 0,
+          "componentVerified": true
+        },
+        {
+          "name": "punch",
+          "bounds": {
+            "x": 19.0,
+            "y": 13.0,
+            "w": 299,
+            "h": 303
+          },
+          "transparentPixels": 55602,
+          "visiblePixels": 37410,
+          "borderVisiblePixels": 49,
+          "componentVerified": true
+        },
+        {
+          "name": "kick",
+          "bounds": {
+            "x": 18.5,
+            "y": 17.0,
+            "w": 284,
+            "h": 297
+          },
+          "transparentPixels": 62472,
+          "visiblePixels": 31412,
+          "borderVisiblePixels": 31,
+          "componentVerified": true
+        }
+      ]
+    },
+    "broker": {
+      "row": 1,
+      "frames": [
+        {
+          "name": "idle",
+          "bounds": {
+            "x": 46.0,
+            "y": 8.5,
+            "w": 234,
+            "h": 304
+          },
+          "transparentPixels": 62196,
+          "visiblePixels": 29361,
+          "borderVisiblePixels": 26,
+          "componentVerified": true
+        },
+        {
+          "name": "walk",
+          "bounds": {
+            "x": 46.5,
+            "y": 5.5,
+            "w": 235,
+            "h": 303
+          },
+          "transparentPixels": 62760,
+          "visiblePixels": 28752,
+          "borderVisiblePixels": 0,
+          "componentVerified": true
+        },
+        {
+          "name": "punch",
+          "bounds": {
+            "x": 3.0,
+            "y": 9.5,
+            "w": 305,
+            "h": 303
+          },
+          "transparentPixels": 56213,
+          "visiblePixels": 34555,
+          "borderVisiblePixels": 25,
+          "componentVerified": true
+        },
+        {
+          "name": "kick",
+          "bounds": {
+            "x": 2.5,
+            "y": 8.5,
+            "w": 295,
+            "h": 304
+          },
+          "transparentPixels": 59626,
+          "visiblePixels": 32073,
+          "borderVisiblePixels": 0,
+          "componentVerified": true
+        }
+      ]
+    },
+    "mafia": {
+      "row": 2,
+      "frames": [
+        {
+          "name": "idle",
+          "bounds": {
+            "x": 38.0,
+            "y": 3.0,
+            "w": 250,
+            "h": 305
+          },
+          "transparentPixels": 57850,
+          "visiblePixels": 32666,
+          "borderVisiblePixels": 39,
+          "componentVerified": true
+        },
+        {
+          "name": "walk",
+          "bounds": {
+            "x": 50.5,
+            "y": 0.0,
+            "w": 233,
+            "h": 305
+          },
+          "transparentPixels": 60619,
+          "visiblePixels": 30882,
+          "borderVisiblePixels": 55,
+          "componentVerified": true
+        },
+        {
+          "name": "punch",
+          "bounds": {
+            "x": 14.0,
+            "y": 5.0,
+            "w": 299,
+            "h": 303
+          },
+          "transparentPixels": 53815,
+          "visiblePixels": 35176,
+          "borderVisiblePixels": 24,
+          "componentVerified": true
+        },
+        {
+          "name": "kick",
+          "bounds": {
+            "x": 12.5,
+            "y": 7.0,
+            "w": 287,
+            "h": 298
+          },
+          "transparentPixels": 60251,
+          "visiblePixels": 30907,
+          "borderVisiblePixels": 17,
+          "componentVerified": true
+        }
+      ]
+    },
+    "baron": {
+      "row": 3,
+      "frames": [
+        {
+          "name": "idle",
+          "bounds": {
+            "x": 39.0,
+            "y": -6.5,
+            "w": 249,
+            "h": 309
+          },
+          "transparentPixels": 57631,
+          "visiblePixels": 35518,
+          "borderVisiblePixels": 41,
+          "componentVerified": true
+        },
+        {
+          "name": "walk",
+          "bounds": {
+            "x": 52.5,
+            "y": -6.5,
+            "w": 231,
+            "h": 307
+          },
+          "transparentPixels": 61803,
+          "visiblePixels": 30938,
+          "borderVisiblePixels": 41,
+          "componentVerified": true
+        },
+        {
+          "name": "punch",
+          "bounds": {
+            "x": 16.0,
+            "y": -2.5,
+            "w": 304,
+            "h": 305
+          },
+          "transparentPixels": 53660,
+          "visiblePixels": 37912,
+          "borderVisiblePixels": 54,
+          "componentVerified": true
+        },
+        {
+          "name": "kick",
+          "bounds": {
+            "x": 9.5,
+            "y": -1.5,
+            "w": 289,
+            "h": 303
+          },
+          "transparentPixels": 61387,
+          "visiblePixels": 31803,
+          "borderVisiblePixels": 47,
+          "componentVerified": true
+        }
+      ]
+    }
+  }
+}

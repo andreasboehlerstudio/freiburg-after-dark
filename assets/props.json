@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "atlas": {
+    "file": "props.png",
+    "width": 1536,
+    "height": 1024
+  },
+  "background": "chroma-green",
+  "keyColor": [
+    0,
+    255,
+    0
+  ],
+  "key": {
+    "greenMin": 130,
+    "dominance": 65,
+    "despillDominance": 25
+  },
+  "coordinateSystem": "source and sourceAnchor are absolute atlas pixels; modelAnchor is in local game units; pixelsPerUnit is source pixels per game unit.",
+  "props": {
+    "bat": {
+      "source": {
+        "x": 115,
+        "y": 842,
+        "w": 1306,
+        "h": 129
+      },
+      "sourceAnchor": {
+        "x": 319,
+        "y": 910
+      },
+      "modelAnchor": {
+        "x": 10,
+        "y": 0
+      },
+      "pixelsPerUnit": 11.214285714285714,
+      "sourceTip": {
+        "x": 1418,
+        "y": 910
+      },
+      "modelTip": {
+        "x": 108,
+        "y": 0
+      },
+      "facing": "right",
+      "modelBounds": {
+        "x": -8.191083,
+        "y": -6.063694,
+        "w": 116.458598,
+        "h": 11.503185
+      }
+    },
+    "bicycle": {
+      "source": {
+        "x": 73,
+        "y": 23,
+        "w": 1384,
+        "h": 792
+      },
+      "sourceAnchor": {
+        "x": 765,
+        "y": 551.5
+      },
+      "modelAnchor": {
+        "x": 0,
+        "y": 0
+      },
+      "pixelsPerUnit": 7.588235294117647,
+      "sourceWheelCenters": [
+        {
+          "x": 340,
+          "y": 549
+        },
+        {
+          "x": 1190,
+          "y": 554
+        }
+      ],
+      "sourceWheelRadius": 258,
+      "groundOffset": 34,
+      "facing": "right",
+      "modelBounds": {
+        "x": -91.193798,
+        "y": -69.647287,
+        "w": 182.387597,
+        "h": 104.372093
+      }
+    }
+  }
+}
