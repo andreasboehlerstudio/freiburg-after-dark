@@ -63,11 +63,13 @@ export class FighterLighting {
     const key = `${id}:${sx},${sy},${sw},${sh}`;
     const cached = this.entries.get(key);
     if (cached) { this.entries.delete(key); this.entries.set(key, cached); return cached; }
-    const scale = Math.min(1, this.maxDimension / Math.max(sw, sh));
-    const width = Math.max(1, Math.round(sw * scale)), height = Math.max(1, Math.round(sh * scale));
+    // A clear one-pixel border makes interpolation identical for the cached
+    // base and the larger reusable work surface, even with tightly cut poses.
+    const scale = Math.min(1, (this.maxDimension - 2) / Math.max(sw, sh));
+    const width = Math.max(1, Math.round(sw * scale)) + 2, height = Math.max(1, Math.round(sh * scale)) + 2;
     const base = makeSurface(width, height), b = base?.getContext('2d');
     if (!b) { this.supported = false; return null; }
-    b.drawImage(image, sx, sy, sw, sh, 0, 0, width, height);
+    b.drawImage(image, sx, sy, sw, sh, 1, 1, width - 2, height - 2);
     b.globalCompositeOperation = 'source-atop';
     b.globalAlpha = .09; b.fillStyle = '#31546d'; b.fillRect(0, 0, width, height);
     b.globalAlpha = 1; b.globalCompositeOperation = 'source-over';
@@ -111,11 +113,11 @@ export class FighterLighting {
     const entry = this.entry(image, sx, sy, sw, sh);
     if (!entry) { context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh); return; }
     const active = lights.filter(light => LIGHT_COLORS[light.kind] && light.intensity > .015).slice(0, 2);
-    if (!active.length) { context.drawImage(entry.base, dx, dy, dw, dh); return; }
+    if (!active.length) { context.drawImage(entry.base, 1, 1, entry.width - 2, entry.height - 2, dx, dy, dw, dh); return; }
     const work = this.work ||= makeSurface(this.maxDimension, this.maxDimension), w = work.getContext('2d');
     const { width, height } = entry;
     w.globalCompositeOperation = 'source-over'; w.globalAlpha = 1;
-    w.clearRect(0, 0, width, height); w.drawImage(entry.base, 0, 0);
+    w.clearRect(0, 0, work.width, work.height); w.drawImage(entry.base, 0, 0);
     w.globalCompositeOperation = 'source-atop';
     for (const light of active) {
       const side = clamp((light.side || 0) * (facing < 0 ? -1 : 1), -1, 1);
@@ -132,7 +134,7 @@ export class FighterLighting {
       }
     }
     w.globalAlpha = 1; w.globalCompositeOperation = 'source-over';
-    context.drawImage(work, 0, 0, width, height, dx, dy, dw, dh);
+    context.drawImage(work, 1, 1, width - 2, height - 2, dx, dy, dw, dh);
   }
 
   /** Ground contact retains fixed feet; only the colored wet spill is local. */

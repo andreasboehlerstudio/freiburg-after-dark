@@ -45,3 +45,25 @@ kbd{background:#20121a;color:var(--paper);border-color:#98303985;letter-spacing:
 #toolbar{top:13.6%;right:3.28%;bottom:auto;gap:6px}
 #toolbar button{width:clamp(28px,2.5cqw,36px);height:clamp(28px,2.5cqw,36px);font-size:clamp(13px,1.25cqw,18px);border:1px solid #eeeae521;background:#080b1266;color:#c8c2c2;border-radius:0}
 #toolbar button:hover{background:#29151dcc;border-color:#d93643;color:#eeeae5}
+
+.menu-sound{position:absolute;right:3.3%;bottom:4.1%;padding:.35cqw .1cqw .35cqw .8cqw;min-height:28px;display:flex;align-items:center;gap:.6cqw;background:transparent;border:0;color:#c7c2bc;font:clamp(10px,.95cqw,17px) var(--display);letter-spacing:.1em}
+.menu-sound::before{content:'';width:5px;height:5px;background:#77716e;border-radius:50%}
+.menu-sound[aria-pressed=true]::before{background:#d93643;box-shadow:0 0 8px #d9364370}
+.menu-sound:hover{color:#f5f0e5}
+
+/* A quiet film-title overlay above the frozen street and separate cheering sprites. */
+.level-celebration{position:absolute;inset:0;overflow:hidden;color:var(--paper)}
+.celebration-heading{position:absolute;top:5.3%;left:4%;right:4%;text-align:center;pointer-events:none}
+.celebration-location{margin:0 0 .85cqw;color:#d0c3c6;font:clamp(8px,.84cqw,17px)/1.3 Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase}
+.celebration-heading h1{margin:0;font:7.1cqw/.99 var(--display);font-weight:400;letter-spacing:.015em;color:#f5f0e5;text-shadow:0 3px 22px #0009}
+#celebration-subtitle{margin:.9cqw 0 0;color:#ef2738;font:2.55cqw/1.12 var(--display);letter-spacing:.13em}
+.celebration-footer{position:absolute;left:4.2%;right:4.2%;bottom:3.4%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2cqw;border-top:1px solid #c12a3a45;padding-top:.9cqw}
+.celebration-score,.celebration-progress{margin:0;font:1.75cqw/1.1 var(--display);font-weight:400;letter-spacing:.03em}
+.celebration-score strong{font-weight:400}.celebration-score span{display:block;margin-top:.3cqw;color:#b4acb1;font:.69cqw/1.2 Arial,sans-serif;letter-spacing:.2em}
+.celebration-progress{text-align:right;color:#eee8e2}.celebration-progress span{color:#b4acb1;font:.77cqw/1.2 Arial,sans-serif;letter-spacing:.08em}
+.celebration-next{display:flex;flex-direction:column;align-items:center;gap:.5cqw}
+.celebration-continue{min-width:25cqw;padding:.68cqw 1.35cqw;font-size:1.24cqw;letter-spacing:.035em}
+.celebration-continue:disabled{cursor:default;background:#5a1420;color:#e5cfce88;transform:none}
+.celebration-key{color:#b4acb1;font:.64cqw/1.2 Arial,sans-serif;letter-spacing:.13em}
+#stage[data-screen=level-clear] #dev{max-width:32%;max-height:12%;overflow:hidden;font-size:8px;opacity:.5;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.celebration-continue:active{transform:none}}

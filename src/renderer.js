@@ -7,6 +7,8 @@ import { drawEditorialHud, drawEditorialNumber } from './editorial-hud.js';
 import { FighterLighting } from './fighter-lighting.js';
 import { SceneLighting, sampleSceneLighting } from './scene-lighting.js';
 import { drawWorldScene } from './world-scene.js';
+import { drawEnemySprite, isPassiveFighter } from './enemy-sprites.js';
+import { drawCarShadow, drawStreetCar } from './street-obstacles.js';
 const W=1280,H=720, INK='#15151f';
 const COLORS={nico:'#ef1824',stefan:'#ef1824',torsten:'#ef1824',andreas:'#ef1824'};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -14,19 +16,20 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const hash=n=>{let v=Math.sin(n*127.1+311.7)*43758.5453;return v-Math.floor(v)};
 
 export class Renderer {
-  constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.sceneLightingEnabled=true;this.metadata={};this.walkMetadata={};this.combatMetadata={};this.enemyMetadata={};this.propMetadata={};this.resize();this._resize=()=>this.resize();window.addEventListener('resize',this._resize);}
+  constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.sceneLightingEnabled=true;this.metadata={};this.walkMetadata={};this.combatMetadata={};this.enemyMetadata={};this.propMetadata={};this.carMetadata={};this.resize();this._resize=()=>this.resize();window.addEventListener('resize',this._resize);}
   resize(){const r=this.canvas.getBoundingClientRect();const ratio=Math.min(window.devicePixelRatio||1,3);this.canvas.width=Math.min(3840,Math.max(1280,Math.round((r.width||1280)*ratio)));this.canvas.height=Math.round(this.canvas.width*9/16);}
-  async load(){this.fighterLighting?.clear();await Promise.all([...Object.keys(WORLD_ART),'nico','stefan','torsten','andreas','enemies','bosses','bouncer','props','walk-nico','walk-stefan','walk-torsten','walk-andreas','combat-nico','combat-stefan','combat-torsten','combat-andreas'].map(async name=>{try{if(Object.hasOwn(WORLD_ART,name)){this.assets[name]=await loadWorldArt(name);return;}const img=new Image();const folder=Object.hasOwn(WORLD_ART,name)?'worlds/':'';img.src=new URL('../assets/'+folder+name+'.png',import.meta.url).href;await img.decode();this.assets[name]=['bouncer','props'].includes(name)?keyBouncerSheet(img):img;}catch{}}));await Promise.all(['heroes','enemies','bosses','bouncer','props','walk','combat'].map(async name=>{try{const r=await fetch(new URL('../assets/'+name+'.json',import.meta.url));if(r.ok){const data=await r.json();if(name==='heroes')this.metadata=data;else if(name==='walk')this.walkMetadata=data;else if(name==='combat')this.combatMetadata=data;else if(name==='props')this.propMetadata=data;else this.enemyMetadata[name]=data;}}catch{}}));return this;}
+  async load(){this.fighterLighting?.clear();await Promise.all([...Object.keys(WORLD_ART),'nico','stefan','torsten','andreas','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk-nico','walk-stefan','walk-torsten','walk-andreas','combat-nico','combat-stefan','combat-torsten','combat-andreas'].map(async name=>{try{if(Object.hasOwn(WORLD_ART,name)){this.assets[name]=await loadWorldArt(name);return;}const img=new Image();const folder=Object.hasOwn(WORLD_ART,name)?'worlds/':'';img.src=new URL('../assets/'+folder+name+'.png',import.meta.url).href;await img.decode();this.assets[name]=['bouncer','props','enemies-night-a','enemies-night-b','street-car'].includes(name)?keyBouncerSheet(img):img;}catch{}}));await Promise.all(['heroes','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk','combat'].map(async name=>{try{const r=await fetch(new URL('../assets/'+name+'.json',import.meta.url));if(r.ok){const data=await r.json();if(name==='heroes')this.metadata=data;else if(name==='walk')this.walkMetadata=data;else if(name==='combat')this.combatMetadata=data;else if(name==='props')this.propMetadata=data;else if(name==='street-car')this.carMetadata=data;else this.enemyMetadata[name]=data;}}catch{}}));return this;}
   reloadAssets(){return this.load();}
   render(game,dt=0){this.game=game||{};if(!this.game.mode||this.game.mode==="playing"||this.game.mode==="menu")this.time+=dt||1/60;this.c=this.ctx;const c=this.c;c.setTransform(this.canvas.width/W,0,0,this.canvas.height/H,0,0);c.clearRect(0,0,W,H);const level=this.levelIndex();const camera=this.game.camera?.x??this.game.camera??0;this.camera=Number(camera)||0;this.drawBackground(level);c.save();const shake=this.game.shake||this.game.screenShake||0;if(shake)c.translate(Math.sin(this.time*95)*Math.min(shake*28,5),Math.cos(this.time*111)*Math.min(shake*20,3));this.drawArena();this.drawWorldObjects();for(const fx of this.game.effects||[])this.effect(fx);c.restore();this.atmosphere(level);this.hud();}
   drawWorldObjects(){
-    const entities=this.entities(),props=(this.game.props||[]).filter(prop=>['ground','thrown'].includes(prop.state));
+    const entities=this.entities(),props=(this.game.props||[]).filter(prop=>['ground','thrown'].includes(prop.state)),cars=(this.game.obstacles||[]).filter(value=>value.kind==='car');
+    for(const car of cars)drawCarShadow(this,car);
     for(const prop of props)drawPropShadow(this,prop);
     for(const entity of entities)this.shadow(entity);
     // Ground-plane Y determines occlusion even while a fighter or prop is airborne.
-    const objects=[...props.map(value=>({kind:'prop',value})),...(this.game.pickups||[]).map(value=>({kind:'pickup',value})),...entities.map(value=>({kind:'entity',value}))];
+    const objects=[...cars.map(value=>({kind:'car',value})),...props.map(value=>({kind:'prop',value})),...(this.game.pickups||[]).map(value=>({kind:'pickup',value})),...entities.map(value=>({kind:'entity',value}))];
     objects.sort((a,b)=>(a.value.y||0)-(b.value.y||0));
-    for(const {kind,value} of objects){if(kind==='prop')drawWorldProp(this,value);else if(kind==='pickup')this.drawPickup(value);else this.drawEntity(value);}
+    for(const {kind,value} of objects){if(kind==='car')drawStreetCar(this,value);else if(kind==='prop')drawWorldProp(this,value);else if(kind==='pickup')this.drawPickup(value);else this.drawEntity(value);}
   }
   levelIndex(){const l=this.game?.level;return this.game?.levelIndex??this.game?.state?.levelIndex??(typeof l==='number'?l:(l?.index??Math.max(0,LEVELS.findIndex(level=>level.id===l?.id))));}
   entities(){const g=this.game;const arr=g.entities||[...this.heroes(),...(g.enemies||[])];return arr.filter(Boolean);}
@@ -39,10 +42,10 @@ export class Renderer {
   drawBackground(level){const view=drawWorldScene(this,level);if(this.sceneLightingEnabled!==false)(this.sceneLighting ||= new SceneLighting()).draw(this.c,level,view?.camera??this.camera??0);return view;}
   lightsFor(e){return this.sceneLightingEnabled===false?[]:sampleSceneLighting(this.levelIndex(),e);}
   drawArena(){const a=this.game.arena;if(!a)return;const c=this.c;if(!a.cleared){for(const worldX of [a.left,a.right]){const x=worldX-this.camera;if(x<10||x>W-10)continue;c.save();c.globalAlpha=.45+.15*Math.sin(this.time*4);for(let y=465;y<655;y+=28)this.path([[x-10,y],[x,y+8],[x-10,y+16],[x-4,y+16],[x+6,y+8],[x-4,y]],'#efad69',null);c.restore();}}else{const x=clamp(a.right-this.camera-65,1080,1180);this.label('WEITER',x,370,14,'#f7d58b','center');this.path([[x-15,393],[x+8,393],[x+8,384],[x+27,400],[x+8,416],[x+8,407],[x-15,407]],'#f7d58b',INK,3);}}
-  shadow(e){if(e.state==='dead')return;const x=e.x-this.camera,y=e.y;const z=e.z||0;(this.fighterLighting ||= new FighterLighting()).drawContact(this.c,e,x,{wet:true,lights:this.lightsFor(e)});if(e.state==='telegraph'){const p=1-clamp((e.attackTime||0)/Math.max(.1,e.attackDuration||.65),0,1);const slam=e.attackKind==='slam',charge=e.attackKind==='charge';this.ellipse(x+(slam?0:(e.facing||1)*55),y,slam?155:65+20*p,slam?58:20,'rgba(255,63,66,.15)','#ff785c',3);if(charge){const d=e.facing||1;this.path([[x+d*45,y-19],[x+d*200,y-19],[x+d*200,y-34],[x+d*248,y],[x+d*200,y+34],[x+d*200,y+19],[x+d*45,y+19]],'rgba(239,85,71,.30)','#ff9b75',2);}this.label(slam?'BODENWELLE':charge?'ANSTURM':'!',x,y-(e.isBoss?270:237),e.isBoss?14:29,'#fff0ba','center');}}
+  shadow(e){if(e.state==='dead')return;const x=e.x-this.camera,y=e.y;const z=e.z||0;(this.fighterLighting ||= new FighterLighting()).drawContact(this.c,e,x,{wet:true,lights:this.lightsFor(e)});if(e.state==='telegraph'){const p=1-clamp((e.attackTime||0)/Math.max(.1,e.attackDuration||.65),0,1);const slam=e.attackKind==='slam',charge=e.attackKind==='charge';this.ellipse(x+(slam?0:(e.facing||1)*55),y,slam?155:65+20*p,slam?58:20,'rgba(255,63,66,.15)','#ff785c',3);if(charge){const d=e.facing||1;this.path([[x+d*45,y-19],[x+d*200,y-19],[x+d*200,y-34],[x+d*248,y],[x+d*200,y+34],[x+d*200,y+19],[x+d*45,y+19]],'rgba(239,85,71,.30)','#ff9b75',2);}this.label(slam?'BODENWELLE':charge?'ANSTURM':'!',x,y-(e.isBoss?270:(e.spriteHeight||211)+26),e.isBoss?14:29,'#fff0ba','center');}}
   isHero(e){return e.type==='hero'||e.isHero||this.heroes().includes(e)||['nico','stefan','torsten','andreas'].includes(e.heroId||e.id);}
   heroId(e){return e.heroId||e.characterId||e.hero||e.id;}
-  drawEntity(e){const x=e.x-this.camera;if(x<-180||x>W+180)return;const c=this.c;c.save();c.translate(x,e.y-(e.z||0));const facing=e.state==='attack'?(e.attackFacing??e.facing??1):(e.facing||1);c.scale(facing,1);if(e.state==='down'||e.state==='dead'){c.translate(0,-11);c.rotate(-Math.PI/2);c.scale(.9,.9);c.globalAlpha=e.state==='dead'?.35:1;}const hero=this.isHero(e);const id=this.heroId(e);c.save();if(hero&&this.assets[id])this.drawHero(e,id);else if(hero||!this.drawEnemySprite(e))this.drawFighter(e,hero);c.restore();if(hero)drawHeldProp(this,e);c.restore();if(hero&&e.state==='down'){this.label('AM BODEN',x,e.y-65,11,'#d5cfd0','center');}if(!hero&&e.hp>0&&!e.isBoss){const w=56;this.bar(x-w/2,e.y-(e.z||0)-225,w,3,e.hp/(e.maxHp||e.hp),'#d93643');}}
+  drawEntity(e){const x=e.x-this.camera;if(x<-180||x>W+180)return;const c=this.c;c.save();c.translate(x,e.y-(e.z||0));const facing=e.state==='attack'?(e.attackFacing??e.facing??1):(e.facing||1);c.scale(facing,1);if(e.state==='down'||e.state==='dead'){if(!isPassiveFighter(e)){c.translate(0,-11);c.rotate(-Math.PI/2);c.scale(.9,.9);}c.globalAlpha=e.state==='dead'?.35:1;}const hero=this.isHero(e);const id=this.heroId(e);c.save();if(hero&&this.assets[id])this.drawHero(e,id);else if(hero||!this.drawEnemySprite(e))this.drawFighter(e,hero);c.restore();if(hero)drawHeldProp(this,e);c.restore();if(hero&&e.state==='down'){this.label('AM BODEN',x,e.y-65,11,'#d5cfd0','center');}if(!hero&&e.hp>0&&!e.isBoss&&!isPassiveFighter(e)){const w=56;this.bar(x-w/2,e.y-(e.z||0)-(e.spriteHeight||211)-14,w,3,e.hp/(e.maxHp||e.hp),'#d93643');}}
   drawHeroGrip(e,pose){
     const id=this.heroId(e);if(!this.assets[id]||!Number.isFinite(pose.gripX)||!Number.isFinite(pose.gripY))return;
     const c=this.c;c.save();c.beginPath();c.ellipse(pose.gripX,pose.gripY,6,5,0,0,Math.PI*2);c.clip();this.drawHero(e,id);c.restore();
@@ -99,30 +102,7 @@ export class Renderer {
     if(e.state==='attack'&&attack>.35){c.save();c.translate(0,-26);c.scale(1.15,1.15);this.attackArc(e,attack);c.restore();}
   }
   drawBouncer(e){return drawBouncer(this,e);}
-  drawEnemySprite(e){
-    if((e.enemyType||e.type)==='bouncer')return this.drawBouncer(e);
-    const type=e.enemyType||e.type,mapping={hooligan:['enemies',0,'hooligan'],suit:['enemies',1,'suit'],runner:['enemies',2,'runner'],extremist:['enemies',3,'extremist'],enforcer:['bosses',e.isBoss?2:0,e.isBoss?'mafia':'enforcer'],broker:['bosses',1,'broker'],baron:['bosses',3,'baron'],bouncer:['bouncer',0,'bouncer']};
-    const entry=mapping[type];if(!entry)return false;
-    const [sheet,row,key]=entry,img=this.assets[sheet];if(!img)return false;
-    const c=this.c,metadata=this.enemyMetadata[sheet]||{},character=metadata.characters?.[key]||metadata.rows?.[key]||metadata[key]||metadata.rows?.[row];
-    const moving=e.state==='walk'||e.attackKind==='charge'&&e.state==='attack';
-    let frame=moving?Math.floor(this.time*8+(e.uid||0)*.7)%2:0;
-    if(e.state==='attack'&&e.attackKind!=='charge')frame=e.attackKind==='kick'?3:2;
-    if(e.state==='attack'&&e.attackKind==='charge'&&Math.floor(this.time*10)%2)frame=2;
-    const cw=img.width/(metadata.columns||4),ch=img.height/(metadata.rowsCount||4);
-    const frames=character?.frames||[],bounds=frames[frame]?.bounds||frames[frame],idle=frames[0]?.bounds||frames[0];
-    const height=e.isBoss?250:211;let sx=frame*cw,sy=row*ch,sw=cw,sh=ch,dx=-height*.55,dy=-height,dw=height*1.1,dh=height;
-    if(bounds?.w&&idle?.h){const scale=height/idle.h;sx+=bounds.x;sy+=bounds.y;sw=bounds.w;sh=bounds.h;dw=sw*scale;dh=sh*scale;dx=(bounds.x-cw/2)*scale;dy=-bounds.h*scale;}
-    const stride=moving?Math.sin(this.time*16+(e.uid||0)*.7):0,progress=e.state==='attack'?Math.sin(clamp((e.attackTime||0)/(e.attackDuration||.4),0,1)*Math.PI):0;
-    c.save();c.translate(progress*6,-Math.abs(stride)*2);c.transform(1,0,-progress*.045,1,0,0);
-    if(e.state==='telegraph'){c.rotate(-.045);c.translate(-5,0);}
-    if(e.state==='hurt'){c.rotate(-.085);c.filter='brightness(1.4)';}
-    if(e.state==='attack'&&e.attackKind==='slam'){c.scale(1,.91);}
-    if(e.invuln>0&&Math.floor(this.time*20)%2)c.globalAlpha*=.7;
-    this.drawLitSprite(e,img,sx,sy,sw,sh,dx,dy,dw,dh);
-    if(e.state==='attack'&&progress>.4){c.save();c.translate(0,e.isBoss?-50:-28);c.scale(e.isBoss?1.35:1.15,e.isBoss?1.35:1.15);this.attackArc(e,progress);c.restore();}
-    c.restore();return true;
-  }
+  drawEnemySprite(e){return drawEnemySprite(this,e);}
   limb(ax,ay,bx,by,cx,cy,width,color){const points=[];for(const [x,y,xx,yy] of [[ax,ay,bx,by],[bx,by,cx,cy]]){const a=Math.atan2(yy-y,xx-x)+Math.PI/2;const dx=Math.cos(a)*width/2,dy=Math.sin(a)*width/2;this.path([[x+dx,y+dy],[xx+dx*.75,yy+dy*.75],[xx-dx*.75,yy-dy*.75],[x-dx,y-dy]],color,INK,3);}this.ellipse(bx,by,width*.39,width*.39,color);}
   drawFighter(e,hero=false){const c=this.c;const kind=e.enemyType||e.type||'brawler';const boss=e.isBoss;const business=boss||/suit|business|broker|specul|boss|mafia|don/.test(kind);const fast=/runner|punk|knife|rush|hooligan/.test(kind);const skin=['#be8065','#dca282','#96654e','#e3b091'][Math.abs((e.uid||e.spawnId||kind.length).toString().split('').reduce((a,b)=>a+b.charCodeAt(0),0))%4];const color=e.color||(boss?'#aa5366':business?'#53616b':fast?'#a15a51':'#6e7280');const move=e.state==='walk'?Math.sin(this.time*(fast?13:10)+(e.x*.01)):0;const ap=e.state==='attack'?Math.sin(clamp((e.attackTime||0)/(e.attackDuration||.45),0,1)*Math.PI):0;const tele=e.state==='telegraph';c.scale(boss?1.42:kind==='enforcer'?1.34:kind==='runner'?1:1.13,boss?1.36:kind==='runner'?1.11:1.16);c.translate(0,-Math.abs(move)*2);if(e.state==='hurt')c.rotate(-.11);if(e.state==='dodge')c.scale(1,.84);if((e.invuln||0)>0&&Math.floor(this.time*20)%2)c.globalAlpha=.65;
     // Legs articulate independently through hips, knees, booted feet.

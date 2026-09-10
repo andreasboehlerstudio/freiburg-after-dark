@@ -6,9 +6,11 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*1.8);
 let serial=0;
 const uid=()=>++serial;
 const BOSS_PATTERNS={broker:['heavy','charge','heavy','slam'],enforcer:['heavy','slam','charge','charge'],baron:['slam','charge','slam','heavy'],bouncer:['heavy','heavy','charge','slam','heavy','slam']};
+const SPAWN_LANES=[468,548,628],MAX_ACTIVE_ENEMIES=3,ENTRY_MARGIN=150;
+const CAR_WIDTH={compact:300,luxury:360},CAR_DEPTH=24;
 
 export class Game {
- constructor({onEvent=()=>{},seed=0xf4e1}={}) { this.onEvent=onEvent; this.seed=seed>>>0;this.randomState=this.seed;this.mode='menu'; this.state={mode:'menu'}; this.time=0; this.enemies=[]; this.effects=[]; this.pickups=[]; this.props=[];this.interactDown=false;this.camera=0; this.score=0; this.combo=0; this.stats={}; }
+ constructor({onEvent=()=>{},seed=0xf4e1}={}) { this.onEvent=onEvent; this.seed=seed>>>0;this.randomState=this.seed;this.mode='menu'; this.state={mode:'menu'}; this.time=0; this.enemies=[]; this.spawnQueue=[];this.spawnDelay=0;this.waveSpawned=null;this.effects=[]; this.pickups=[]; this.props=[];this.interactDown=false;this.camera=0; this.score=0; this.combo=0; this.stats={}; }
  random() { let n=this.randomState=(this.randomState+0x6d2b79f5)>>>0;n=Math.imul(n^(n>>>15),n|1);n^=n+Math.imul(n^(n>>>7),n|61);return ((n^(n>>>14))>>>0)/4294967296; }
  setMode(mode) { this.mode=mode; this.state.mode=mode; }
  emit(type,data={}) { this.onEvent({type,...data}); }
@@ -23,30 +25,106 @@ export class Game {
  loadLevel(index) {
   if(!Number.isInteger(index)||!LEVELS[index])throw new RangeError('Unbekanntes Level.');
   this.levelIndex=index;this.level=LEVELS[index];this.camera=0;this.enemies=[];this.effects=[];this.pickups=[];this.rescues=2;this.transition=0;this.defeatTimer=0;this.shake=0;
+  this.obstacles=[{model:'compact',x:640,y:500},{model:'luxury',x:1840,y:608},{model:'luxury',x:3020,y:500},{model:'luxury',x:4200,y:608}].map(car=>({...car,uid:uid(),kind:'car',hp:car.model==='compact'?125:180,maxHp:car.model==='compact'?125:180}));
   this.props=[.14,.43,.72].map((fraction,i)=>({uid:uid(),type:i===1?'bicycle':'bat',x:Math.round(this.level.width*fraction),y:555+i*23,z:0,rotation:0,state:'ground',durability:i===1?null:ITEM_TYPES.bat.durability}));
   this.player.x=230;this.player.y=555;this.partner.x=145;this.partner.y=610;
   for(const h of [this.player,this.partner]) {
    h.hp=Math.min(h.maxHp,h.hp+h.maxHp*.45);if(h.hp<=0)h.hp=h.maxHp*.6;
    h.state='idle';h.downTimer=0;h.rescueProgress=0;h.attackTime=0;h.attackDuration=0;h.attackContactTime=0;h.attackKind='';h.attackHits=new Set();h.didStrike=false;h.hitstun=0;h.z=0;h.vz=0;h.vx=0;h.vy=0;h.comboStep=0;h.comboWindow=0;h.cooldown=0;h.dodgeTime=0;h.dodgeCooldown=0;h.specialCooldown=0;h.walkDistance=0;h.walkSpeed=0;h.walking=false;
    h.invuln=2;h.energy=Math.min(100,h.energy+40);
-   h.heldItem=null;h.pendingInteract=null;h.batInputUntil=0;h.airAttackUsed=false;h.landingRecovery=0;
+   h.heldItem=null;h.pendingInteract=null;h.batInputUntil=0;h.airAttackUsed=false;h.landingRecovery=0;h.obstacleRoute=null;
   }
   this.enterArena(0);this.emit('level',{index,name:this.level.name});
  }
- enterArena(index) { const span=this.level.width/this.level.waves.length;this.arena={index,left:index*span,right:(index+1)*span,cleared:false};this.wave=1;this.waveDelay=.9;this.waitingWave=true;this.announcement=index===0?this.level.subtitle:'ARENA '+(index+1);this.announcementTime=2.2; }
+ enterArena(index) { const span=this.level.width/this.level.waves.length;this.arena={index,left:index*span,right:(index+1)*span,cleared:false};this.spawnQueue=[];this.spawnDelay=0;this.waveSpawned=null;this.wave=1;this.waveDelay=.9;this.waitingWave=true;this.announcement=index===0?this.level.subtitle:'ARENA '+(index+1);this.announcementTime=2.2; }
  spawnWave() {
+  const waveKey=this.arena.index+':'+this.wave;if(this.waveSpawned===waveKey)return;
   const arenaWaves=this.level.waves[this.arena.index];const count=arenaWaves[this.wave-1];const bossWave=this.arena.index===this.level.waves.length-1&&this.wave===arenaWaves.length;
   const types=this.level.enemyRoster||Object.keys(ENEMY_TYPES);
-  for(let i=0;i<count;i++) {
-   const boss=bossWave&&i===0; const type=boss?this.level.bossType:types[(i+this.arena.index+this.wave+this.levelIndex)%types.length];
-   const d=boss?{name:this.level.boss,hp:420+Math.min(this.levelIndex,2)*100,speed:130+Math.min(this.levelIndex,2)*8,power:21+Math.min(this.levelIndex,2)*2,color:this.level.accent,range:115,telegraph:.9,kind:'heavy',...this.level.bossStats}:ENEMY_TYPES[type];
-   const hp=d.hp*(boss?1:this.level.enemyHealthScale??1+Math.min(this.levelIndex,2)*.12);
-   const x=clamp(this.player.x+((i%3===2)?-390:440+i*58),this.arena.left+45,this.arena.right-45);
-   this.enemies.push({...d,uid:uid(),id:type,type,isBoss:boss,x,y:470+(i*61)%165,z:0,vx:0,vy:0,facing:-1,hp,maxHp:hp,state:'idle',invuln:0,hitstun:0,cooldown:.6+i*.27,attackTime:0,attackDuration:0,attackKind:'',attackCount:0,deadTime:0});
-  }
+  this.spawnQueue=Array.from({length:count},(_,order)=>({order,boss:bossWave&&order===0,type:bossWave&&order===0?this.level.bossType:types[(order+this.arena.index+this.wave+this.levelIndex)%types.length]}));
+  this.spawnDelay=0;this.waveSpawned=waveKey;
   this.waitingWave=false;this.emit('wave',{wave:this.wave,arena:this.arena.index,boss:bossWave});this.announcement=bossWave?this.level.boss:'WELLE '+this.wave+' / '+arenaWaves.length;this.announcementTime=1.5;
+  this.updateSpawnQueue(0);
+ }
+ spawnEnemy({order,boss,type}) {
+  const d=boss?{name:this.level.boss,hp:420+Math.min(this.levelIndex,2)*100,speed:130+Math.min(this.levelIndex,2)*8,power:21+Math.min(this.levelIndex,2)*2,color:this.level.accent,range:115,telegraph:.9,kind:'heavy',...this.level.bossStats}:ENEMY_TYPES[type];
+  const hp=d.hp*(boss?1:this.level.enemyHealthScale??1+Math.min(this.levelIndex,2)*.12);
+  const passive=d.passive||d.kind==='passive',side=(order+this.arena.index+this.wave+this.levelIndex)%2?1:-1;
+  let y=passive?628:SPAWN_LANES[(order*2+this.wave+this.arena.index)%SPAWN_LANES.length];
+  // Entrants start beyond both the viewport and the arena. Only this brief
+  // approach may use the outer corridor; normal combat keeps the arena bounds.
+  let x=side<0?Math.min(this.camera-ENTRY_MARGIN,this.arena.left-ENTRY_MARGIN):Math.max(this.camera+1280+ENTRY_MARGIN,this.arena.right+ENTRY_MARGIN);
+  if(passive){
+   const living=[this.player,this.partner].filter(hero=>hero.hp>0);
+   const compact=this.obstacles.find(car=>car.model==='compact'&&car.x>this.arena.left+220&&car.x<this.arena.right-220);
+   if(compact)y=compact.y;
+   const candidates=compact?[compact.x-230,compact.x+230]:[this.arena.left+65,this.arena.right-65];
+   const clearance=position=>Math.min(...living.map(hero=>Math.hypot(position-hero.x,(y-hero.y)*1.8)));
+   x=candidates.sort((a,b)=>clearance(b)-clearance(a))[0];
+   if(clearance(x)<180){
+    const seats=candidates.flatMap(position=>[468,650].map(lane=>({x:position,y:lane,clearance:Math.min(...living.map(hero=>Math.hypot(position-hero.x,(lane-hero.y)*1.8)))})));
+    const seat=seats.sort((a,b)=>b.clearance-a.clearance)[0];x=seat.x;y=seat.y;
+   }
+  }
+  const enemy={...d,uid:uid(),id:type,type,isBoss:boss,x,y,z:0,vx:0,vy:0,facing:passive?1:-side,hp,maxHp:hp,state:'idle',entering:!passive,entrySide:side,invuln:0,hitstun:0,cooldown:.6,attackTime:0,attackDuration:0,attackKind:'',attackCount:0,deadTime:0};
+  this.enemies.push(enemy);this.emit('enemy-enter',{uid:enemy.uid,enemyType:type,boss,side,x,y});
+ }
+ updateSpawnQueue(dt) {
+  if(this.mode!=='playing'||this.player.hp<=0||!this.spawnQueue.length)return;
+  if(this.enemies.filter(enemy=>enemy.hp>0).length>=MAX_ACTIVE_ENEMIES)return;
+  this.spawnDelay=Math.max(0,this.spawnDelay-dt);if(this.spawnDelay>0)return;
+  const next=this.spawnQueue.shift();this.spawnEnemy(next);
+  // Two separated arrivals form a small group, followed by a longer breath.
+  this.spawnDelay=next.boss?2.4:next.order%2===0?.55:1.55;
+ }
+ hurtCar(car,damage,source) {
+  if(car.hp<=0)return false;
+  car.hp=Math.max(0,car.hp-damage);
+  this.effect('hit',car.x,car.y-60,{color:'#ffe3b8',life:.22,maxLife:.22});
+  this.emit('car-hit',{targetUid:car.uid,model:car.model,x:car.x,y:car.y,damage,hero:source?.heroId});
+  if(car.hp===0){this.emit('car-break',{targetUid:car.uid,model:car.model,x:car.x,y:car.y});this.shake=Math.max(this.shake,.13);}
+  return true;
+ }
+ resolveObstacles(entity,fromX,fromY) {
+  if(entity.entering)return;
+  for(const car of this.obstacles||[]){
+   if(car.hp<=0)continue;
+   const half=CAR_WIDTH[car.model]/2+16,depth=CAR_DEPTH+12;
+   const left=car.x-half,right=car.x+half,top=car.y-depth,bottom=car.y+depth;
+   if(entity.x<=left||entity.x>=right||entity.y<=top||entity.y>=bottom)continue;
+   if(fromX<=left)entity.x=left;else if(fromX>=right)entity.x=right;
+   else if(fromY<=top)entity.y=top;else if(fromY>=bottom)entity.y=bottom;
+   else{
+    const edges=[{axis:'x',value:left,d:entity.x-left},{axis:'x',value:right,d:right-entity.x},{axis:'y',value:top,d:entity.y-top},{axis:'y',value:bottom,d:bottom-entity.y}];
+    const edge=edges.sort((a,b)=>a.d-b.d)[0];entity[edge.axis]=edge.value;
+   }
+  }
+ }
+ obstacleInput(entity,target,input) {
+  let route=entity.obstacleRoute;
+  if(route){
+   const car=(this.obstacles||[]).find(item=>item.uid===route.uid&&item.hp>0);
+   if(!car||(entity.x-route.exitX)*route.direction>=0||(target.x-entity.x)*route.direction<-30){entity.obstacleRoute=null;route=null;}
+  }
+  if(!route&&input.x){
+   for(const car of this.obstacles||[]){
+    const half=CAR_WIDTH[car.model]/2+16,dx=car.x-entity.x,direction=Math.sign(input.x);
+    if(car.hp<=0||dx*direction<0||Math.abs(dx)>half+85||Math.abs(entity.y-car.y)>CAR_DEPTH+16||(target.x-car.x)*direction<-half)continue;
+    const options=[car.y-60,car.y+60].filter(y=>y>=440&&y<=650);
+    const y=options.sort((a,b)=>Math.abs(a-entity.y)-Math.abs(b-entity.y))[0];
+    route=entity.obstacleRoute={uid:car.uid,y,direction,exitX:car.x+direction*(half+35)};break;
+   }
+  }
+  if(!route)return input;
+  return Math.abs(entity.y-route.y)>3?{...input,x:0,y:Math.sign(route.y-entity.y)}:{...input,x:route.direction,y:0};
  }
  pause(){if(this.mode==='playing'){this.shake=0;for(const h of [this.player,this.partner]){h.pendingInteract=null;h.batInputUntil=0;}this.setMode('paused');}} resume(){if(this.mode==='paused')this.setMode('playing');}
+ continueLevel(){
+  if(this.mode!=='level-clear')return false;
+  if(this.levelIndex<LEVELS.length-1){this.setMode('playing');this.loadLevel(this.levelIndex+1);}
+  else{this.setMode('victory');this.score+=5000;this.emit('victory',{score:this.score,stats:this.stats});}
+  return true;
+ }
  getNearbyProp(h=this.player) {
   if(!h||h.hp<=0||h.z>0||h.heldItem)return null;
   return this.props.filter(p=>p.state==='ground'&&Math.abs(p.x-h.x)<=90&&Math.abs(p.y-h.y)<=55).sort((a,b)=>distance(a,h)-distance(b,h))[0]||null;
@@ -79,6 +157,11 @@ export class Game {
     if(e.hp<=0||prop.hitUids.has(e.uid)||height.top<8||height.bottom>(e.isBoss?268:211)||Math.abs(e.y-prop.y)>50||e.x<Math.min(previousX,prop.x)-radius||e.x>Math.max(previousX,prop.x)+radius)continue;
     if(this.hurt(e,prop.damage,source,prop.type==='bicycle'?320:230)){prop.hitUids.add(e.uid);this.emit('prop-hit',{hero:source.heroId,propType:prop.type,uid:prop.uid,targetUid:e.uid,x:e.x,y:e.y});}
    }
+   if(source)for(const car of this.obstacles||[]){
+    const half=CAR_WIDTH[car.model]/2;
+    if(car.hp<=0||prop.hitUids.has(car.uid)||height.top<8||height.bottom>170||Math.abs(car.y-prop.y)>CAR_DEPTH+42||car.x+half<Math.min(previousX,prop.x)-radius||car.x-half>Math.max(previousX,prop.x)+radius)continue;
+    if(this.hurtCar(car,prop.damage,source))prop.hitUids.add(car.uid);
+   }
    if(prop.life<=0||prop.z===0||prop.x===20||prop.x===this.level.width-20){prop.state='ground';prop.z=0;prop.rotation=0;prop.vx=0;prop.vz=0;prop.life=0;prop.hitUids.clear();this.emit('prop-land',{propType:prop.type,uid:prop.uid,x:prop.x,y:prop.y});}
   }
  }
@@ -107,6 +190,7 @@ export class Game {
   if(kind==='special'){ range={nico:235,stefan:190,torsten:280,andreas:190}[h.heroId];depth=h.heroId==='torsten'?160:115;damage={nico:56,stefan:48,torsten:58,andreas:34}[h.heroId]*h.power;knock=390;omni=h.heroId!=='nico';this.effect('special',h.x,h.y,{color:h.color,life:.65,maxLife:.65,radius:range,heroId:h.heroId}); }
   if(h.isPartner)damage*=.8;
   let hits=0;for(const e of this.enemies){if(e.hp<=0||h.attackHits.has(e.uid)||Math.abs(e.y-h.y)>depth||Math.abs(e.x-h.x)>range||(!omni&&(e.x-h.x)*h.attackFacing < -26))continue;h.attackHits.add(e.uid);if(this.hurt(e,damage,h,knock))hits++;}
+  for(const car of this.obstacles||[]){const half=CAR_WIDTH[car.model]/2;if(car.hp<=0||h.attackHits.has(car.uid)||Math.abs(car.y-h.y)>depth+CAR_DEPTH||Math.abs(car.x-h.x)>range+half||(!omni&&(car.x-h.x)*h.attackFacing < -half-26))continue;h.attackHits.add(car.uid);if(this.hurtCar(car,damage,h))hits++;}
   if(hits&&kind==='bat'&&h.heldItem?.type==='bat'){h.heldItem.durability--;this.emit('prop-bat-hit',{hero:h.heroId,propType:'bat',uid:h.heldItem.uid,hits,x:h.x,y:h.y});if(h.heldItem.durability<=0){this.emit('prop-break',{hero:h.heroId,propType:'bat',uid:h.heldItem.uid,x:h.x,y:h.y});h.heldItem=null;}}
   if(hits&&kind==='jump-kick')this.emit('jump-hit',{hero:h.heroId,hits,x:h.x,y:h.y});
  }
@@ -147,14 +231,20 @@ export class Game {
  }
  partnerInput(dt) {
   const h=this.partner,p=this.player;if(h.hp<=0)return{};
-  if(p.hp<=0){const dx=p.x-h.x,dy=p.y-h.y;if(distance(p,h)>75)return{x:Math.abs(dx)>35?Math.sign(dx):0,y:Math.abs(dy)>25?Math.sign(dy):0};return{attack:!!this.enemies.find(e=>e.hp>0&&distance(e,h)<105)};}
+  if(p.hp<=0){const dx=p.x-h.x,dy=p.y-h.y;if(distance(p,h)>75)return this.obstacleInput(h,p,{x:Math.abs(dx)>35?Math.sign(dx):0,y:Math.abs(dy)>25?Math.sign(dy):0});return{attack:!!this.enemies.find(e=>e.hp>0&&distance(e,h)<105)};}
   let enemy=this.enemies.filter(e=>e.hp>0).sort((a,b)=>distance(a,h)-distance(b,h))[0];
   if(Math.abs(h.x-p.x)>670){h.x=p.x-90*p.facing;h.y=clamp(p.y+35,450,645);this.effect('heal',h.x,h.y,{color:h.color});}
-  if(enemy&&distance(enemy,p)<950){let dx=enemy.x-h.x,dy=enemy.y-h.y;h.facing=Math.sign(dx)||h.facing;return{x:Math.abs(dx)>74?Math.sign(dx):0,y:Math.abs(dy)>27?Math.sign(dy):0,attack:Math.abs(dx)<102&&Math.abs(dy)<47,heavy:enemy.isBoss&&Math.abs(dx)<110&&Math.abs(dy)<48,special:h.energy>=70&&Math.abs(dx)<150&&Math.abs(dy)<65,dodge:enemy.state==='telegraph'&&enemy.attackTime<.18&&distance(enemy,h)<130&&h.dodgeCooldown<=0};}
-  const dx=p.x-p.facing*95-h.x,dy=p.y+36-h.y;return{x:Math.abs(dx)>45?Math.sign(dx):0,y:Math.abs(dy)>25?Math.sign(dy):0};
+  if(enemy&&distance(enemy,p)<950){let dx=enemy.x-h.x,dy=enemy.y-h.y;h.facing=Math.sign(dx)||h.facing;return this.obstacleInput(h,enemy,{x:Math.abs(dx)>74?Math.sign(dx):0,y:Math.abs(dy)>27?Math.sign(dy):0,attack:Math.abs(dx)<102&&Math.abs(dy)<47,heavy:enemy.isBoss&&Math.abs(dx)<110&&Math.abs(dy)<48,special:h.energy>=70&&Math.abs(dx)<150&&Math.abs(dy)<65,dodge:enemy.state==='telegraph'&&enemy.attackTime<.18&&distance(enemy,h)<130&&h.dodgeCooldown<=0});}
+  const dx=p.x-p.facing*95-h.x,dy=p.y+36-h.y;return this.obstacleInput(h,p,{x:Math.abs(dx)>45?Math.sign(dx):0,y:Math.abs(dy)>25?Math.sign(dy):0});
  }
  enemyUpdate(e,dt) {
   if(e.hp<=0){e.deadTime-=dt;return;}if(e.hitstun>0)return;
+  if(e.passive||e.kind==='passive'){e.state='idle';e.attackTime=0;return;}
+  if(e.entering){
+   const left=this.arena.left+45,right=this.arena.right-45;
+   if(e.x>=left&&e.x<=right)e.entering=false;
+   else{const target=e.x<left?left:right;e.facing=Math.sign(target-e.x);e.state='walk';e.x+=e.facing*Math.min(Math.abs(target-e.x),e.speed*dt);e.cooldown=Math.max(e.cooldown,.45);if(e.x===target)e.entering=false;return;}
+  }
   if(e.state==='telegraph'){
    if(e.attackTime<=0){e.state='attack';e.attackDuration=e.type==='bouncer'?(e.attackKind==='charge'?.64:e.attackKind==='slam'?.58:.5):e.attackKind==='charge'?.62:.38;e.attackTime=e.attackDuration;e.didStrike=false;e.attackHits=new Set();this.emit('enemy-swing',{boss:e.isBoss,kind:e.attackKind});}return;
   }
@@ -170,9 +260,10 @@ export class Game {
    e.attackKind=e.isBoss?pattern[e.attackCount%pattern.length]:e.kind;e.attackCount++;
    e.enraged=e.isBoss&&e.hp<e.maxHp*.4;e.attackDuration=(e.telegraph+(e.attackKind==='slam'?.32:0))*(e.enraged?.8:1);e.attackTime=e.attackDuration;e.state='telegraph';e.attackTarget={x:target.x,y:target.y};this.emit('telegraph',{boss:e.isBoss,kind:e.attackKind,x:e.x,y:e.y});return;
   }
-  const hold=active>=2&&Math.abs(dx)<160;let mx=Math.abs(dx)>e.range*.78&&!hold?Math.sign(dx):0;let my=Math.abs(dy)>22?Math.sign(dy):0;e.x+=mx*e.speed*dt;e.y+=my*e.speed*.54*dt;e.state=mx||my?'walk':'idle';
+  const hold=active>=2&&Math.abs(dx)<160;const move=this.obstacleInput(e,target,{x:Math.abs(dx)>e.range*.78&&!hold?Math.sign(dx):0,y:Math.abs(dy)>22?Math.sign(dy):0});e.x+=move.x*e.speed*dt;e.y+=move.y*e.speed*.54*dt;e.state=move.x||move.y?'walk':'idle';
  }
  enemyStrike(e) {
+  if(e.passive||e.kind==='passive')return;
   const slam=e.attackKind==='slam',charge=e.attackKind==='charge';
   if(slam)this.effect('shockwave',e.x,e.y,{radius:205,color:'#ff7b67',life:.5,maxLife:.5});
   for(const h of [this.player,this.partner]){if(e.attackHits.has(h.uid)||h.hp<=0)continue;const dx=h.x-e.x,dy=Math.abs(h.y-e.y);if(Math.abs(dx)<(slam?205:charge?100:e.range+20)&&dy<(slam?110:52)&&(slam||dx*e.facing>-28)){if(this.hurt(h,e.power*(slam?1.25:1),e,slam?300:180))e.attackHits.add(h.uid);}}
@@ -186,7 +277,7 @@ export class Game {
   this.heroUpdate(this.player,dt,{...input,interact:interactPressed});this.heroUpdate(this.partner,dt,this.partnerInput(dt));for(const e of this.enemies)this.enemyUpdate(e,dt);
   const right=this.arena.cleared?Math.min(this.level.width,this.arena.right+220):this.arena.right-25;
   for(const e of all){
-   e.x=clamp(e.x,this.arena.left+20,right);e.y=clamp(e.y,440,650);
+   if(!e.entering)e.x=clamp(e.x,this.arena.left+20,right);e.y=clamp(e.y,440,650);this.resolveObstacles(e,e.motionStartX,e.motionStartY);
    const travel=Math.hypot(e.x-e.motionStartX,e.y-e.motionStartY);
    // Only real grounded travel advances the gait: never hit knockback,
    // an arena clamp, a sidekick catch-up teleport, or holding against a wall.
@@ -199,9 +290,13 @@ export class Game {
   for(const item of this.pickups){item.life-=dt;for(const h of [this.player,this.partner]){if(h.hp>0&&distance(h,item)<58){if(item.kind==='food')h.hp=Math.min(h.maxHp,h.hp+40);else h.energy=Math.min(100,h.energy+28);this.effect('heal',h.x,h.y-90,{text:item.kind==='food'?'+40 LP':'+28 EN',color:'#94ffcc',life:.9,maxLife:.9});item.life=0;this.emit('pickup',{kind:item.kind});break;}}}this.pickups=this.pickups.filter(p=>p.life>0);
   this.updateRescue(dt,input);
   if(this.mode!=='playing')return;
-  if(this.waitingWave){this.waveDelay-=dt;if(this.waveDelay<=0)this.spawnWave();}
-  else if(!this.enemies.some(e=>e.hp>0)&&!this.arena.cleared){if(this.wave<this.level.waves[this.arena.index].length){this.wave++;this.waitingWave=true;this.waveDelay=1.4;}else{this.arena.cleared=true;this.announcement='WEITER →';this.announcementTime=3;this.score+=500;this.emit('arena-clear',{arena:this.arena.index});for(const h of [this.player,this.partner])if(h.hp>0)h.hp=Math.min(h.maxHp,h.hp+(this.level.arenaHeal||12));}}
-  if(this.arena.cleared&&this.player.hp>0&&this.player.x>this.arena.right-95){if(this.arena.index<this.level.waves.length-1)this.enterArena(this.arena.index+1);else{this.stats.levelsCleared++;this.emit('level-clear',{index:this.levelIndex,name:this.level.name});if(this.levelIndex<LEVELS.length-1)this.loadLevel(this.levelIndex+1);else{this.setMode('victory');this.score+=5000;this.emit('victory',{score:this.score,stats:this.stats});}}}
+  if(this.waitingWave){if(this.player.hp>0)this.waveDelay-=dt;if(this.waveDelay<=0&&this.player.hp>0)this.spawnWave();}
+  else this.updateSpawnQueue(dt);
+  if(!this.waitingWave&&!this.spawnQueue.length&&!this.enemies.some(e=>e.hp>0)&&!this.arena.cleared){if(this.wave<this.level.waves[this.arena.index].length){this.wave++;this.waitingWave=true;this.waveDelay=1.4;}else{this.arena.cleared=true;this.announcement='WEITER →';this.announcementTime=3;this.score+=500;this.emit('arena-clear',{arena:this.arena.index});for(const h of [this.player,this.partner])if(h.hp>0)h.hp=Math.min(h.maxHp,h.hp+(this.level.arenaHeal||12));}}
+  if(this.arena.cleared&&this.arena.index===this.level.waves.length-1&&!this.waitingWave&&!this.spawnQueue.length&&!this.enemies.some(enemy=>enemy.hp>0)&&(this.player.hp>0||this.partner.hp>0)){
+   this.stats.levelsCleared++;this.shake=0;this.setMode('level-clear');this.emit('level-clear',{index:this.levelIndex,name:this.level.name,score:this.score,final:this.levelIndex===LEVELS.length-1});return;
+  }
+  if(this.arena.cleared&&this.player.hp>0&&this.player.x>this.arena.right-95&&this.arena.index<this.level.waves.length-1)this.enterArena(this.arena.index+1);
   const desired=clamp(this.player.x-470,this.arena.left,Math.max(this.arena.left,this.arena.right-1280));const unlocked=clamp(this.player.x-470,0,this.level.width-1280);this.camera+=( (this.arena.cleared?unlocked:clamp(desired,0,this.level.width-1280))-this.camera)*Math.min(1,dt*7);
  }
  updateRescue(dt,input){

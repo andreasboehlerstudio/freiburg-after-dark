@@ -1,0 +1,106 @@
+{
+  "file": "street-car.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 3,
+  "rowsCount": 2,
+  "background": "chroma-green",
+  "vehicles": {
+    "compact": {
+      "row": 0,
+      "referenceWidth": 494,
+      "frames": [
+        {
+          "name": "intact",
+          "source": {
+            "x": 15,
+            "y": 200,
+            "w": 494,
+            "h": 234
+          },
+          "sourceAnchor": {
+            "x": 256.0,
+            "y": 434
+          },
+          "visiblePixels": 81975
+        },
+        {
+          "name": "damaged",
+          "source": {
+            "x": 523,
+            "y": 200,
+            "w": 492,
+            "h": 234
+          },
+          "sourceAnchor": {
+            "x": 768.0,
+            "y": 434
+          },
+          "visiblePixels": 83056
+        },
+        {
+          "name": "wreck",
+          "source": {
+            "x": 1029,
+            "y": 200,
+            "w": 492,
+            "h": 232
+          },
+          "sourceAnchor": {
+            "x": 1280.0,
+            "y": 434
+          },
+          "visiblePixels": 85175
+        }
+      ]
+    },
+    "luxury": {
+      "row": 1,
+      "referenceWidth": 498,
+      "frames": [
+        {
+          "name": "intact",
+          "source": {
+            "x": 12,
+            "y": 612,
+            "w": 498,
+            "h": 190
+          },
+          "sourceAnchor": {
+            "x": 256.0,
+            "y": 807
+          },
+          "visiblePixels": 67384
+        },
+        {
+          "name": "damaged",
+          "source": {
+            "x": 517,
+            "y": 612,
+            "w": 501,
+            "h": 192
+          },
+          "sourceAnchor": {
+            "x": 768.0,
+            "y": 807
+          },
+          "visiblePixels": 69343
+        },
+        {
+          "name": "wreck",
+          "source": {
+            "x": 1025,
+            "y": 612,
+            "w": 499,
+            "h": 195
+          },
+          "sourceAnchor": {
+            "x": 1280.0,
+            "y": 807
+          },
+          "visiblePixels": 71444
+        }
+      ]
+    }
+  }
+}
