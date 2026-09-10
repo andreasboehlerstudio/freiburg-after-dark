@@ -1,7 +1,8 @@
 import { clipSpriteFrame } from './combat-animation.js';
 import { LIGHT_COLORS } from './scene-lighting.js';
+import { CAR_DEPTH, CAR_WIDTHS } from './street-layout.js';
 
-export const CAR_WIDTHS = Object.freeze({ compact: 300, luxury: 360 });
+export { CAR_WIDTHS } from './street-layout.js';
 export function carDamageFrame(car) {
   if (car.hp <= 0) return 2;
   return car.hp <= (car.maxHp || car.hp) * .5 ? 1 : 0;
@@ -40,9 +41,9 @@ export function drawCarShadow(renderer, car) {
   const c = renderer.c, x = car.x - renderer.camera, width = CAR_WIDTHS[car.model] || CAR_WIDTHS.compact;
   const ellipse = (px, y, rx, ry, fill) => { c.beginPath(); c.ellipse(px, y, rx, ry, 0, 0, Math.PI * 2); c.fillStyle = fill; c.fill(); };
   c.save();
-  ellipse(x, car.y + 5, width * .48, 17, '#02050b45');
-  ellipse(x, car.y + 2, width * .43, 9, '#01030975');
-  for (const sign of [-1, 1]) ellipse(x + sign * width * .3, car.y + 1, width * .075, 4, '#010207b8');
+  ellipse(x, car.y + 5, width * .48, CAR_DEPTH * .64, '#02050b45');
+  ellipse(x, car.y + 2, width * .43, CAR_DEPTH * .34, '#01030975');
+  for (const sign of [-1, 1]) ellipse(x + sign * width * .3, car.y + 1, width * .075, CAR_DEPTH * .15, '#010207b8');
   for (const light of renderer.lightsFor?.(car) || []) {
     if (!LIGHT_COLORS[light.kind]) continue;
     c.save(); c.globalAlpha *= light.intensity * .2;

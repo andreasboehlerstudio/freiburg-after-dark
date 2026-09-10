@@ -1,0 +1,60 @@
+{
+  "file": "counter-skinny.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "skinny": {
+      "row": 0,
+      "referenceHeight": 782,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 169,
+            "y": 32,
+            "w": 662,
+            "h": 782
+          },
+          "sourceAnchor": {
+            "x": 488.25,
+            "y": 814
+          },
+          "bounds": {
+            "x": 169,
+            "y": 32,
+            "w": 662,
+            "h": 782
+          },
+          "visiblePixels": 168225,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1049,
+            "y": 32,
+            "w": 440,
+            "h": 783
+          },
+          "sourceAnchor": {
+            "x": 1279.5,
+            "y": 815
+          },
+          "bounds": {
+            "x": 109,
+            "y": 32,
+            "w": 440,
+            "h": 783
+          },
+          "visiblePixels": 153190,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "file": "steps-night-a.png",
+  "width": 1024,
+  "height": 1536,
+  "columns": 2,
+  "rowsCount": 4,
+  "background": "chroma-green",
+  "characters": {
+    "tattoo": {
+      "row": 0,
+      "referenceHeight": 366,
+      "frames": [
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 189,
+            "y": 12,
+            "w": 212,
+            "h": 366
+          },
+          "sourceAnchor": {
+            "x": 292.75,
+            "y": 378
+          },
+          "bounds": {
+            "x": 189.0,
+            "y": 12.0,
+            "w": 212,
+            "h": 366
+          },
+          "visiblePixels": 37171,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        },
+        {
+          "name": "passing-b",
+          "source": {
+            "x": 625,
+            "y": 12,
+            "w": 219,
+            "h": 366
+          },
+          "sourceAnchor": {
+            "x": 722.25,
+            "y": 378
+          },
+          "bounds": {
+            "x": 113.0,
+            "y": 12.0,
+            "w": 219,
+            "h": 366
+          },
+          "visiblePixels": 36099,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        }
+      ]
+    },
+    "clubfighter": {
+      "row": 1,
+      "referenceHeight": 369,
+      "frames": [
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 194,
+            "y": 392,
+            "w": 198,
+            "h": 369
+          },
+          "sourceAnchor": {
+            "x": 287.5,
+            "y": 761
+          },
+          "bounds": {
+            "x": 194.0,
+            "y": 8.0,
+            "w": 198,
+            "h": 369
+          },
+          "visiblePixels": 34416,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        },
+        {
+          "name": "passing-b",
+          "source": {
+            "x": 626,
+            "y": 392,
+            "w": 198,
+            "h": 369
+          },
+          "sourceAnchor": {
+            "x": 715.5,
+            "y": 761
+          },
+          "bounds": {
+            "x": 114.0,
+            "y": 8.0,
+            "w": 198,
+            "h": 369
+          },
+          "visiblePixels": 33828,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        }
+      ]
+    },
+    "civic": {
+      "row": 2,
+      "referenceHeight": 372,
+      "frames": [
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 187,
+            "y": 774,
+            "w": 207,
+            "h": 372
+          },
+          "sourceAnchor": {
+            "x": 281.5,
+            "y": 1146
+          },
+          "bounds": {
+            "x": 187.0,
+            "y": 6.0,
+            "w": 207,
+            "h": 372
+          },
+          "visiblePixels": 34635,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        },
+        {
+          "name": "passing-b",
+          "source": {
+            "x": 626,
+            "y": 774,
+            "w": 203,
+            "h": 372
+          },
+          "sourceAnchor": {
+            "x": 695.0,
+            "y": 1146
+          },
+          "bounds": {
+            "x": 114.0,
+            "y": 6.0,
+            "w": 203,
+            "h": 372
+          },
+          "visiblePixels": 33895,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        }
+      ]
+    },
+    "blackbomber": {
+      "row": 3,
+      "referenceHeight": 369,
+      "frames": [
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 186,
+            "y": 1157,
+            "w": 219,
+            "h": 369
+          },
+          "sourceAnchor": {
+            "x": 287.5,
+            "y": 1526
+          },
+          "bounds": {
+            "x": 186.0,
+            "y": 5.0,
+            "w": 219,
+            "h": 369
+          },
+          "visiblePixels": 41923,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        },
+        {
+          "name": "passing-b",
+          "source": {
+            "x": 619,
+            "y": 1157,
+            "w": 219,
+            "h": 369
+          },
+          "sourceAnchor": {
+            "x": 716.0,
+            "y": 1526
+          },
+          "bounds": {
+            "x": 107.0,
+            "y": 5.0,
+            "w": 219,
+            "h": 369
+          },
+          "visiblePixels": 40728,
+          "nearLeg": "swing",
+          "farLeg": "support"
+        }
+      ]
+    }
+  }
+}

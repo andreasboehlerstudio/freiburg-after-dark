@@ -1,3 +1,4 @@
+import { ENEMY_MOTION_ASSETS, ENEMY_COUNTER_ASSETS } from './enemy-motion.js';
 import {Game,HEROES,LEVELS} from './engine.js';
 import {combatFrame,clipSpriteFrame} from './combat-animation.js';
 import {Renderer} from './renderer.js';
@@ -130,7 +131,7 @@ function tick(now){
  game.shake=shake;syncAudio();frames++;if(now-fpsAt>700){fps=Math.round(frames*1000/(now-fpsAt));frames=0;fpsAt=now;if(isDev){dev.hidden=!['playing','level-clear'].includes(screen);dev.textContent=JSON.stringify({fps,mode:game.mode,celebration:{active:celebration.active,time:Number(celebration.time.toFixed(2)),ready:celebration.ready},hero:game.player?.heroId,partner:game.partner?.heroId,level:game.levelIndex,arena:game.arena?.index,wave:game.wave,x:Math.round(game.player?.x||0),camera:Math.round(game.camera),hp:Math.round(game.player?.hp||0),partnerHp:Math.round(game.partner?.hp||0),held:game.player?.heldItem?.type||null,props:game.props?.map(p=>({type:p.type,state:p.state,x:Math.round(p.x),y:Math.round(p.y)})),attackKind:game.player?.attackKind,enemies:game.enemies?.filter(e=>e.hp>0).length,score:game.score,combo:game.combo,stats:game.stats,time:Math.round(game.time),buffer:[canvas.width,canvas.height],z:Math.round(game.player?.z||0),walk:{state:game.player?.state,active:game.player?.walking,distance:Math.round(game.player?.walkDistance||0),frame:renderer.walkFrame(game.player||{},hero),partnerDistance:Math.round(game.partner?.walkDistance||0)},combat:{...combatFrame(game.player),ready:!!renderer.assets['combat-'+hero],frames:renderer.combatMetadata[hero]?.frames?.length||0},inputSeen,auto:testAuto,rate:testRate,sound:{context:audio.ctx?.state,menu:audio.menu,celebrating:audio.celebrating,level:audio.level,voices:audio.voiceBuffers.size,errors:audio.errors,tracks:[...audio.tracks.values()].map(t=>({level:t.index,playing:t.playing,paused:t.media.paused,ready:t.media.readyState,loop:t.media.loop,time:Math.round(t.media.currentTime*10)/10}))},events:testLog.slice(-4)})}}}
 overlay.innerHTML='<div class="loading">Freiburg wird wach …</div>';
 await Promise.all([renderer.load(),menuScene.load(),celebration.load(),document.fonts.load('16px "Freiburg Display"')]);
-const required=[...LEVELS.map(level=>level.worldKey),'nico','stefan','torsten','andreas','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk-nico','walk-stefan','walk-torsten','walk-andreas','combat-nico','combat-stefan','combat-torsten','combat-andreas'];
+const required=[...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS,...LEVELS.map(level=>level.worldKey),'nico','stefan','torsten','andreas','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk-nico','walk-stefan','walk-torsten','walk-andreas','combat-nico','combat-stefan','combat-torsten','combat-andreas'];
 const missing=required.filter(x=>!renderer.assets[x]);
 if(missing.length)throw new Error('Grafiken fehlen: '+missing.join(', '));
 for(const type of ['bat','bicycle'])if(!renderer.propMetadata?.props?.[type]?.source)throw new Error('Gegenstandsgrafik fehlt: '+type);
@@ -138,6 +139,11 @@ for(const model of ['compact','luxury'])if(renderer.carMetadata?.vehicles?.[mode
 for(const [sheet,count] of [['enemies-night-a',4],['enemies-night-b',5]]){
  const characters=Object.values(renderer.enemyMetadata[sheet]?.characters||{});
  if(characters.length!==count||characters.some(character=>character.frames?.length!==4))throw new Error('Gegnerposen fehlen: '+sheet);
+}
+for(const sheet of [...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS]){
+ const characters=Object.values(renderer.enemyMetadata[sheet]?.characters||{});
+ const counter=sheet.startsWith('counter-'),frames=sheet.startsWith('motion-')?8:2;
+ if(characters.length!==(counter?1:4)||characters.some(character=>!(character.referenceHeight>0)||character.frames?.length!==frames||character.frames.some(frame=>!frame.source||!frame.sourceAnchor)))throw new Error('Gegnerbewegungen fehlen: '+sheet);
 }
 for(const id of Object.keys(HEROES))if(renderer.walkMetadata[id]?.frames?.length!==8)throw new Error('Laufposen fehlen: '+id);
 for(const id of Object.keys(HEROES))if(renderer.combatMetadata[id]?.frames?.length!==16)throw new Error('Kampfposen fehlen: '+id);

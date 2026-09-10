@@ -1,0 +1,60 @@
+{
+  "file": "counter-nightowl.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "nightowl": {
+      "row": 0,
+      "referenceHeight": 778,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 193,
+            "y": 39,
+            "w": 625,
+            "h": 777
+          },
+          "sourceAnchor": {
+            "x": 481.5,
+            "y": 816
+          },
+          "bounds": {
+            "x": 193,
+            "y": 39,
+            "w": 625,
+            "h": 777
+          },
+          "visiblePixels": 153717,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1053,
+            "y": 39,
+            "w": 423,
+            "h": 778
+          },
+          "sourceAnchor": {
+            "x": 1286.25,
+            "y": 817
+          },
+          "bounds": {
+            "x": 117,
+            "y": 39,
+            "w": 423,
+            "h": 778
+          },
+          "visiblePixels": 141241,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

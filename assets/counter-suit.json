@@ -1,0 +1,60 @@
+{
+  "file": "counter-suit.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "suit": {
+      "row": 0,
+      "referenceHeight": 868,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 102,
+            "y": 57,
+            "w": 675,
+            "h": 862
+          },
+          "sourceAnchor": {
+            "x": 410.0,
+            "y": 919
+          },
+          "bounds": {
+            "x": 102,
+            "y": 57,
+            "w": 675,
+            "h": 862
+          },
+          "visiblePixels": 201280,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 888,
+            "y": 57,
+            "w": 454,
+            "h": 873
+          },
+          "sourceAnchor": {
+            "x": 1132.0,
+            "y": 930
+          },
+          "bounds": {
+            "x": 56,
+            "y": 57,
+            "w": 454,
+            "h": 873
+          },
+          "visiblePixels": 196144,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

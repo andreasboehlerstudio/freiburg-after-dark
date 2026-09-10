@@ -1,4 +1,5 @@
 import { clipSpriteFrame } from './combat-animation.js';
+import { enemyMotion, authoredEnemyPose } from './enemy-motion.js';
 
 export const ENEMY_ART = Object.freeze({
   hooligan: ['enemies', 0, 'hooligan'], suit: ['enemies', 1, 'suit'],
@@ -23,9 +24,11 @@ export function enemySpritePose(renderer, entity) {
   const metadata = renderer.enemyMetadata[sheet] || {};
   const character = metadata.characters?.[key] || metadata.rows?.[key] || metadata[key] || metadata.rows?.[defaultRow];
   const passive = isPassiveFighter(entity);
-  const moving = !passive && (entity.state === 'walk' || entity.attackKind === 'charge' && entity.state === 'attack');
-  let index = moving ? Math.floor(renderer.time * 8 + (entity.uid || 0) * .7) % 2 : 0;
+  const motion = enemyMotion(entity, sheet, key);
+  const moving = !passive && !!motion && motion.action === 'walk';
+  let index = moving ? 1 : 0;
   if (!passive && entity.state === 'attack' && entity.attackKind !== 'charge') index = entity.attackKind === 'kick' ? 3 : 2;
+  if (motion?.guard) index = 0;
   if (!passive && entity.state === 'attack' && entity.attackKind === 'charge' && Math.floor(renderer.time * 10) % 2) index = 2;
   if (passive) index = entity.state === 'hurt' ? 2 : ['dead', 'down'].includes(entity.state) ? 3 : entity.state === 'walk' ? 1 : 0;
   const columns = metadata.columns || 4, rows = metadata.rowsCount || (sheet === 'enemies-night-b' ? 5 : 4);
@@ -45,17 +48,18 @@ export function enemySpritePose(renderer, entity) {
     dw = source.w * scale; dh = source.h * scale;
   }
   if (![source.x, source.y, source.w, source.h, scale, dx, dy, dw, dh].every(Number.isFinite) || source.w <= 0 || source.h <= 0 || scale <= 0 || source.x < 0 || source.y < 0 || source.x + source.w > image.width || source.y + source.h > image.height) return null;
-  return { image, source, frame, index, row, height, scale, dx, dy, dw, dh, moving, passive };
+  return authoredEnemyPose(renderer, entity, { image, source, frame, index, row, height, scale, dx, dy, dw, dh, moving, passive }, sheet, key);
 }
 
 export function drawEnemySprite(renderer, entity) {
   if ((entity.enemyType || entity.type) === 'bouncer') return renderer.drawBouncer(entity);
   const pose = enemySpritePose(renderer, entity);
   if (!pose) return false;
-  const { image, source: s, frame, scale, dx, dy, dw, dh, moving, passive } = pose, c = renderer.c;
-  const stride = moving ? Math.sin(renderer.time * 16 + (entity.uid || 0) * .7) : 0;
-  const progress = !passive && entity.state === 'attack' ? Math.sin(Math.max(0, Math.min(1, (entity.attackTime || 0) / (entity.attackDuration || .4))) * Math.PI) : 0;
-  c.save(); c.translate(progress * 6, -Math.abs(stride) * 2); c.transform(1, 0, -progress * .045, 1, 0, 0);
+  const { image, source: s, frame, scale, dx, dy, dw, dh, passive, motion } = pose, c = renderer.c;
+  const progress = !passive && entity.state === 'attack'
+    ? motion ? motion.extension || 0 : Math.sin(Math.max(0, Math.min(1, (entity.attackTime || 0) / (entity.attackDuration || .4))) * Math.PI)
+    : 0;
+  c.save(); c.translate(progress * 3, 0);
   if (!passive && entity.state === 'telegraph') { c.rotate(-.045); c.translate(-5, 0); }
   if (entity.state === 'hurt') { if (!passive) c.rotate(-.085); c.filter = 'brightness(1.4)'; }
   if (!passive && entity.state === 'attack' && entity.attackKind === 'slam') c.scale(1, .91);

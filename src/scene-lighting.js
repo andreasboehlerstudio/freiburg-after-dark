@@ -1,5 +1,6 @@
 import { WORLD_ART, worldArtSectionGeometry } from './world-art.js';
 import { LEVELS } from './data.js';
+import { LampFlares, practicalLightStrength } from './lamp-flares.js';
 
 export const LIGHT_COLORS = Object.freeze({ amber: '#ffc17a', red: '#ff5969', cyan: '#7cd4ee' });
 const KEYS = LEVELS.map(level => level.worldKey || (level.id === 'kajo' ? 'martinstor' : level.id));
@@ -34,6 +35,7 @@ export const SCENE_LIGHT_ART = {
       ['Laterne an der Haltestelle', .402, .477, 'amber', 'lamp'],
       ['Tram / Innenraum', .655, .725, 'amber', 'window'],
       ['Hängelampe vor Martinstor', .735, .357, 'amber', 'lamp'],
+      ['Zweite Hängelampe vor Martinstor', .796, .485, 'amber', 'lamp', .65],
       ['Laterne am Tor', .922, .70, 'amber', 'lamp', .65],
     ] },
   ],
@@ -62,6 +64,7 @@ export const SCENE_LIGHT_ART = {
       ['Laterne an der Radstation', .522, .274, 'amber', 'lamp'],
       ['Radstation / rote Fenster', .61, .59, 'red', 'window'],
       ['Laterne an der Brücke', .823, .465, 'amber', 'lamp', .7],
+      ['Laterne am rechten Brückenbogen', .926, .415, 'amber', 'lamp', .65],
       ['Laterne am rechten Weg', .982, .308, 'amber', 'lamp'],
     ] },
   ],
@@ -81,11 +84,17 @@ export const SCENE_LIGHT_ART = {
       ['Weglaterne 6', .949, .432, 'amber', 'lamp'],
     ] },
     { size: [2172, 724], lights: [
+      ['Laterne vor linkem Parkcafé', .038, .488, 'amber', 'lamp', .85],
       ['Laterne an der Bank', .131, .469, 'amber', 'lamp'],
       ['Laterne am Rasen', .224, .541, 'amber', 'lamp', .8],
       ['Laterne am Querweg', .424, .55, 'amber', 'lamp', .8],
       ['Laterne vor Brunnen', .477, .541, 'amber', 'lamp', .8],
+      ['Laterne am hinteren Gartenweg', .343, .58, 'amber', 'lamp', .55],
+      ['Laterne am hinteren Querweg', .536, .602, 'amber', 'lamp', .45],
+      ['Laterne vor hinterem Pavillon', .611, .586, 'amber', 'lamp', .5],
+      ['Laterne am hinteren Kirchweg', .667, .594, 'amber', 'lamp', .45],
       ['Laterne am Kirchplatz', .742, .559, 'amber', 'lamp', .85],
+      ['Laterne am rechten Parkausgang', .888, .586, 'amber', 'lamp', .6],
       ['Laterne rechts der Kirche', .977, .545, 'amber', 'lamp'],
     ] },
   ],
@@ -180,10 +189,9 @@ export const SCENE_LIGHT_ART = {
   ],
 };
 
-export function mapSceneLight(key, section, light) {
+export function mapScenePoint(key, section, u, v) {
   const { size } = SCENE_LIGHT_ART[key][section];
   const geometry = worldArtSectionGeometry({ width: size[0], height: size[1] }, WORLD_ART[key][section]);
-  const [name, u, v, kind, type, strength = 1, radius = type === 'lamp' ? 205 : 180] = light;
   const region = v < WORLD_ART[key][section].ground ? geometry.architecture : geometry.floor;
   const { source: s, destination: d } = region;
   const panelX = d.x + (u * size[0] - s.x) / s.width * d.width;
@@ -191,8 +199,13 @@ export function mapSceneLight(key, section, light) {
   // Later paintings cover the final 100 px of the preceding painting. Do
   // not relight a lamp that has been cropped out or covered by that overlap.
   const visible = panelX >= (section ? 55 : 0) && panelX < (section < 2 ? 1550 : 1600) && y >= 0 && y <= 720;
-  return { name, key, section, kind, type, x: section * 1500 + panelX, y,
-    radius, verticalRadius: type === 'lamp' ? 460 : 330, strength, visible };
+  return { key, section, x: section * 1500 + panelX, y, visible };
+}
+
+export function mapSceneLight(key, section, light) {
+  const [name, u, v, kind, type, strength = 1, radius = type === 'lamp' ? 205 : 180] = light;
+  return { ...mapScenePoint(key, section, u, v), name, kind, type,
+    radius, verticalRadius: type === 'lamp' ? 460 : 330, strength };
 }
 
 const mapped = new Map();
@@ -251,7 +264,7 @@ export class SceneLighting {
     c.fillStyle = gradient; c.fillRect(0, 0, 128, 128);
     this.glows.set(kind, canvas); return canvas;
   }
-  draw(context, level, camera = 0) {
+  draw(context, level, camera = 0, { time = 0, reducedMotion = false } = {}) {
     context.save();
     context.globalCompositeOperation = 'screen';
     for (const light of sceneLights(level)) {
@@ -259,18 +272,15 @@ export class SceneLighting {
       if (x < -light.radius || x > 1280 + light.radius) continue;
       const texture = this.glow(light.kind);
       if (!texture) continue;
+      const strength = practicalLightStrength(light, time, reducedMotion);
       const lamp = light.type === 'lamp', rx = lamp ? 37 : 87, ry = lamp ? 37 : 52;
-      context.globalAlpha = (lamp ? .34 : .20) * light.strength;
+      context.globalAlpha = (lamp ? .34 : .20) * strength;
       context.drawImage(texture, x - rx, light.y - ry, rx * 2, ry * 2);
-      if (lamp) {
-        // Restrained anamorphic streak on the visible bulb itself.
-        context.globalAlpha = .24 * light.strength;
-        context.drawImage(texture, x - 64, light.y - 2, 128, 4);
-      }
       // Broad but faint wet paving spill is centered beneath the real source.
-      context.globalAlpha = (lamp ? .10 : .13) * light.strength;
+      context.globalAlpha = (lamp ? .10 : .13) * strength;
       context.drawImage(texture, x - light.radius * .7, 465, light.radius * 1.4, 154);
     }
     context.restore();
+    (this.flares ||= new LampFlares()).draw(context, sceneLights(level), camera, { time, reducedMotion });
   }
 }

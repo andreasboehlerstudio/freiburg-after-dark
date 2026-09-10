@@ -23,11 +23,16 @@ export function bouncerFrame(entity, time = 0) {
   if (entity.state === 'attack') {
     if (entity.attackKind === 'charge') return Math.floor(time * 12) % 2 ? 1 : 2;
     if (entity.attackKind === 'slam') return entity.didStrike ? 7 : 3;
-    if (entity.attackKind === 'kick') return entity.didStrike ? 6 : 3;
+    if (entity.attackKind === 'kick') return entity.didStrike ? entity.attackTime > .14 ? 6 : 3 : 3;
     const elapsed = 1 - entity.attackTime / entity.attackDuration;
     return entity.didStrike ? elapsed > .72 ? 5 : 4 : 3;
   }
-  if (entity.state === 'walk') return Math.floor(time * 7) % 2 ? 1 : 2;
+  if (entity.state === 'walk') {
+    // Live movement is measured after collisions, so the boss never runs
+    // in place against an obstacle. Time remains a preview-only fallback.
+    if (Number.isFinite(entity.walkDistance)) return entity.walking ? Math.floor(entity.walkDistance / 44) % 2 ? 1 : 2 : 0;
+    return Math.floor(time * 7) % 2 ? 1 : 2;
+  }
   return 0;
 }
 

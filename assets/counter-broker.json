@@ -1,0 +1,60 @@
+{
+  "file": "counter-broker.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "broker": {
+      "row": 0,
+      "referenceHeight": 852,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 73,
+            "y": 57,
+            "w": 725,
+            "h": 841
+          },
+          "sourceAnchor": {
+            "x": 406.5,
+            "y": 898
+          },
+          "bounds": {
+            "x": 73,
+            "y": 57,
+            "w": 725,
+            "h": 841
+          },
+          "visiblePixels": 228935,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 825,
+            "y": 57,
+            "w": 545,
+            "h": 864
+          },
+          "sourceAnchor": {
+            "x": 1140.0,
+            "y": 921
+          },
+          "bounds": {
+            "x": 13,
+            "y": 57,
+            "w": 545,
+            "h": 864
+          },
+          "visiblePixels": 217909,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

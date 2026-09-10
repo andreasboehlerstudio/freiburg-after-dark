@@ -1,0 +1,60 @@
+{
+  "file": "counter-clubfighter.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "clubfighter": {
+      "row": 0,
+      "referenceHeight": 792,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 188,
+            "y": 25,
+            "w": 627,
+            "h": 788
+          },
+          "sourceAnchor": {
+            "x": 489.0,
+            "y": 813
+          },
+          "bounds": {
+            "x": 188,
+            "y": 25,
+            "w": 627,
+            "h": 788
+          },
+          "visiblePixels": 187005,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1045,
+            "y": 26,
+            "w": 456,
+            "h": 796
+          },
+          "sourceAnchor": {
+            "x": 1313.5,
+            "y": 822
+          },
+          "bounds": {
+            "x": 115,
+            "y": 26,
+            "w": 456,
+            "h": 796
+          },
+          "visiblePixels": 167289,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

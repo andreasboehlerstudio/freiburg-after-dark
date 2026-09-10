@@ -1,0 +1,60 @@
+{
+  "file": "counter-hooligan.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "hooligan": {
+      "row": 0,
+      "referenceHeight": 854,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 84,
+            "y": 65,
+            "w": 648,
+            "h": 846
+          },
+          "sourceAnchor": {
+            "x": 431.5,
+            "y": 911
+          },
+          "bounds": {
+            "x": 84,
+            "y": 65,
+            "w": 648,
+            "h": 846
+          },
+          "visiblePixels": 207537,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 890,
+            "y": 65,
+            "w": 455,
+            "h": 862
+          },
+          "sourceAnchor": {
+            "x": 1159.5,
+            "y": 927
+          },
+          "bounds": {
+            "x": 79,
+            "y": 65,
+            "w": 455,
+            "h": 862
+          },
+          "visiblePixels": 187950,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

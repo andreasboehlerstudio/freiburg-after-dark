@@ -1,0 +1,60 @@
+{
+  "file": "counter-civic.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "civic": {
+      "row": 0,
+      "referenceHeight": 780,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 184,
+            "y": 29,
+            "w": 648,
+            "h": 778
+          },
+          "sourceAnchor": {
+            "x": 466.25,
+            "y": 807
+          },
+          "bounds": {
+            "x": 184,
+            "y": 29,
+            "w": 648,
+            "h": 778
+          },
+          "visiblePixels": 181137,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1056,
+            "y": 28,
+            "w": 443,
+            "h": 783
+          },
+          "sourceAnchor": {
+            "x": 1291.5,
+            "y": 811
+          },
+          "bounds": {
+            "x": 112,
+            "y": 28,
+            "w": 443,
+            "h": 783
+          },
+          "visiblePixels": 161577,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

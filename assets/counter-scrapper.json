@@ -1,0 +1,60 @@
+{
+  "file": "counter-scrapper.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "scrapper": {
+      "row": 0,
+      "referenceHeight": 779,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 170,
+            "y": 38,
+            "w": 655,
+            "h": 776
+          },
+          "sourceAnchor": {
+            "x": 477.5,
+            "y": 814
+          },
+          "bounds": {
+            "x": 170,
+            "y": 38,
+            "w": 655,
+            "h": 776
+          },
+          "visiblePixels": 180418,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1047,
+            "y": 38,
+            "w": 443,
+            "h": 782
+          },
+          "sourceAnchor": {
+            "x": 1282.5,
+            "y": 820
+          },
+          "bounds": {
+            "x": 111,
+            "y": 38,
+            "w": 443,
+            "h": 782
+          },
+          "visiblePixels": 161322,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

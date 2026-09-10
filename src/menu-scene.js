@@ -1,8 +1,9 @@
+import { LampFlares, menuLamps } from './lamp-flares.js';
 const W=1280,H=720;
 const hash=n=>{const v=Math.sin(n*127.1+31.7)*43758.5453;return v-Math.floor(v)};
 export class MenuScene {
   constructor(canvas){
-    this.canvas=canvas;this.c=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.frames=0;this.pointer={x:0,y:0};this.offset={x:0,y:0};this.reduced=matchMedia('(prefers-reduced-motion: reduce)');
+    this.canvas=canvas;this.c=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.frames=0;this.sceneLightingEnabled=true;this.lampFlares=new LampFlares();this.pointer={x:0,y:0};this.offset={x:0,y:0};this.reduced=matchMedia('(prefers-reduced-motion: reduce)');
     canvas.parentElement.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();if(!canvas.hidden&&r.width){this.pointer.x=(e.clientX-r.left)/r.width-.5;this.pointer.y=(e.clientY-r.top)/r.height-.5;}});
     canvas.parentElement.addEventListener('pointerleave',()=>{this.pointer.x=0;this.pointer.y=0;});
     this.resize();window.addEventListener('resize',()=>this.resize());
@@ -42,9 +43,6 @@ export class MenuScene {
       c.drawImage(image,b.x,sourceY,b.w,sourceH,x+a.x-w*(stretch-1)*.5,dy,w*stretch,dh+.22);
     }
   }
-  flare(x,y,width,color,strength){
-    const c=this.c;c.save();c.globalCompositeOperation='screen';c.globalAlpha=strength;const g=c.createLinearGradient(x-width/2,y,x+width/2,y);g.addColorStop(0,'transparent');g.addColorStop(.42,color);g.addColorStop(.5,'#e8fbff');g.addColorStop(.58,color);g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(x-width/2,y-1,width,2);c.globalAlpha=strength*.14;c.fillRect(x-width/2,y-4,width,8);c.restore();
-  }
   rain(front=false){
     const c=this.c,count=front?34:112;c.save();c.strokeStyle=front?'rgba(200,224,237,.2)':'rgba(139,189,211,.15)';c.lineWidth=front?.8:.6;c.beginPath();
     for(let i=0;i<count;i++){const seed=i+(front?400:0),speed=front?560:350,x=(hash(seed)*1380-this.time*27+this.offset.x*4+13800)%1380-50,y=(hash(seed+82)*900+this.time*speed)%900-90,length=front?18:10;c.moveTo(x,y);c.lineTo(x-1.9,y+length);}c.stroke();c.restore();
@@ -54,7 +52,7 @@ export class MenuScene {
     this.offset.x+=(this.pointer.x-this.offset.x)*Math.min(1,dt*4);this.offset.y+=(this.pointer.y-this.offset.y)*Math.min(1,dt*4);if(this.reduced.matches)this.offset={x:0,y:0};
     const c=this.c;c.setTransform(this.canvas.width/W,0,0,this.canvas.height/H,0,0);c.drawImage(this.assets.background,-5+this.offset.x*2,-4+this.offset.y*2,W+10,H+8);
     const left=c.createLinearGradient(0,0,580,0);left.addColorStop(0,'rgba(2,5,10,.18)');left.addColorStop(1,'rgba(2,5,10,0)');c.fillStyle=left;c.fillRect(0,0,580,H);
-    this.rain();this.flare(970,177,280,'#8bddfa',.32+Math.sin(this.time*.8)*.035);this.flare(1200,490,165,'#f22436',.18);
+    this.rain();if(this.sceneLightingEnabled!==false)this.lampFlares.draw(c,menuLamps(this.offset),0,{time:this.time,reducedMotion:this.reduced.matches});
     // Back figures first, crouching figure last, all independently animated.
     for(const index of [1,2,0,3])this.drawHero(this.heroes[index],index);
     this.rain(true);

@@ -1,0 +1,60 @@
+{
+  "file": "counter-baron.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "baron": {
+      "row": 0,
+      "referenceHeight": 849,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 91,
+            "y": 58,
+            "w": 681,
+            "h": 848
+          },
+          "sourceAnchor": {
+            "x": 412.0,
+            "y": 906
+          },
+          "bounds": {
+            "x": 91,
+            "y": 58,
+            "w": 681,
+            "h": 848
+          },
+          "visiblePixels": 229844,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 877,
+            "y": 59,
+            "w": 501,
+            "h": 850
+          },
+          "sourceAnchor": {
+            "x": 1143.75,
+            "y": 909
+          },
+          "bounds": {
+            "x": 53,
+            "y": 59,
+            "w": 501,
+            "h": 850
+          },
+          "visiblePixels": 203012,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

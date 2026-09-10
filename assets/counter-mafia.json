@@ -1,0 +1,60 @@
+{
+  "file": "counter-mafia.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "mafia": {
+      "row": 0,
+      "referenceHeight": 841,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 96,
+            "y": 63,
+            "w": 684,
+            "h": 837
+          },
+          "sourceAnchor": {
+            "x": 419.0,
+            "y": 900
+          },
+          "bounds": {
+            "x": 96,
+            "y": 63,
+            "w": 684,
+            "h": 837
+          },
+          "visiblePixels": 205446,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 890,
+            "y": 63,
+            "w": 456,
+            "h": 845
+          },
+          "sourceAnchor": {
+            "x": 1134.5,
+            "y": 908
+          },
+          "bounds": {
+            "x": 55,
+            "y": 63,
+            "w": 456,
+            "h": 845
+          },
+          "visiblePixels": 192090,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

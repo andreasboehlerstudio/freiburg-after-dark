@@ -1,0 +1,690 @@
+{
+  "file": "motion-night-b.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 8,
+  "rowsCount": 4,
+  "background": "chroma-green",
+  "characters": {
+    "nightowl": {
+      "row": 0,
+      "referenceHeight": 218,
+      "frames": [
+        {
+          "name": "contact-a",
+          "source": {
+            "x": 28,
+            "y": 12,
+            "w": 175,
+            "h": 217
+          },
+          "sourceAnchor": {
+            "x": 95.0,
+            "y": 229
+          },
+          "bounds": {
+            "x": 28.0,
+            "y": 12.0,
+            "w": 175,
+            "h": 217
+          },
+          "visiblePixels": 13152
+        },
+        {
+          "name": "step-a",
+          "source": {
+            "x": 257,
+            "y": 11,
+            "w": 162,
+            "h": 219
+          },
+          "sourceAnchor": {
+            "x": 331.0,
+            "y": 230
+          },
+          "bounds": {
+            "x": 35.25,
+            "y": 11.0,
+            "w": 162,
+            "h": 219
+          },
+          "visiblePixels": 12915
+        },
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 475,
+            "y": 11,
+            "w": 183,
+            "h": 218
+          },
+          "sourceAnchor": {
+            "x": 549.0,
+            "y": 229
+          },
+          "bounds": {
+            "x": 31.5,
+            "y": 11.0,
+            "w": 183,
+            "h": 218
+          },
+          "visiblePixels": 12696
+        },
+        {
+          "name": "step-b",
+          "source": {
+            "x": 720,
+            "y": 10,
+            "w": 134,
+            "h": 219
+          },
+          "sourceAnchor": {
+            "x": 774.0,
+            "y": 229
+          },
+          "bounds": {
+            "x": 54.75,
+            "y": 10.0,
+            "w": 134,
+            "h": 219
+          },
+          "visiblePixels": 12164
+        },
+        {
+          "name": "lift",
+          "source": {
+            "x": 966,
+            "y": 12,
+            "w": 109,
+            "h": 218
+          },
+          "sourceAnchor": {
+            "x": 1004.0,
+            "y": 230
+          },
+          "bounds": {
+            "x": 79.0,
+            "y": 12.0,
+            "w": 109,
+            "h": 218
+          },
+          "visiblePixels": 12240
+        },
+        {
+          "name": "chamber",
+          "source": {
+            "x": 1172,
+            "y": 11,
+            "w": 103,
+            "h": 218
+          },
+          "sourceAnchor": {
+            "x": 1222.5,
+            "y": 229
+          },
+          "bounds": {
+            "x": 63.25,
+            "y": 11.0,
+            "w": 103,
+            "h": 218
+          },
+          "visiblePixels": 11841
+        },
+        {
+          "name": "contact",
+          "source": {
+            "x": 1353,
+            "y": 19,
+            "w": 199,
+            "h": 211
+          },
+          "sourceAnchor": {
+            "x": 1413.0,
+            "y": 230
+          },
+          "bounds": {
+            "x": 22.5,
+            "y": 19.0,
+            "w": 199,
+            "h": 211
+          },
+          "visiblePixels": 12916
+        },
+        {
+          "name": "retract",
+          "source": {
+            "x": 1615,
+            "y": 12,
+            "w": 118,
+            "h": 218
+          },
+          "sourceAnchor": {
+            "x": 1671.0,
+            "y": 230
+          },
+          "bounds": {
+            "x": 62.75,
+            "y": 12.0,
+            "w": 118,
+            "h": 218
+          },
+          "visiblePixels": 11987
+        }
+      ],
+      "baseWalkAnchor": {
+        "x": 408.0,
+        "y": 294
+      }
+    },
+    "scrapper": {
+      "row": 1,
+      "referenceHeight": 224,
+      "frames": [
+        {
+          "name": "contact-a",
+          "source": {
+            "x": 24,
+            "y": 236,
+            "w": 178,
+            "h": 223
+          },
+          "sourceAnchor": {
+            "x": 98.0,
+            "y": 459
+          },
+          "bounds": {
+            "x": 24.0,
+            "y": 14.25,
+            "w": 178,
+            "h": 223
+          },
+          "visiblePixels": 16093
+        },
+        {
+          "name": "step-a",
+          "source": {
+            "x": 256,
+            "y": 236,
+            "w": 170,
+            "h": 224
+          },
+          "sourceAnchor": {
+            "x": 335.0,
+            "y": 460
+          },
+          "bounds": {
+            "x": 34.25,
+            "y": 14.25,
+            "w": 170,
+            "h": 224
+          },
+          "visiblePixels": 15355
+        },
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 471,
+            "y": 236,
+            "w": 187,
+            "h": 223
+          },
+          "sourceAnchor": {
+            "x": 549.0,
+            "y": 459
+          },
+          "bounds": {
+            "x": 27.5,
+            "y": 14.25,
+            "w": 187,
+            "h": 223
+          },
+          "visiblePixels": 16061
+        },
+        {
+          "name": "step-b",
+          "source": {
+            "x": 716,
+            "y": 236,
+            "w": 141,
+            "h": 223
+          },
+          "sourceAnchor": {
+            "x": 771.0,
+            "y": 459
+          },
+          "bounds": {
+            "x": 50.75,
+            "y": 14.25,
+            "w": 141,
+            "h": 223
+          },
+          "visiblePixels": 14254
+        },
+        {
+          "name": "lift",
+          "source": {
+            "x": 965,
+            "y": 236,
+            "w": 122,
+            "h": 224
+          },
+          "sourceAnchor": {
+            "x": 1003.5,
+            "y": 460
+          },
+          "bounds": {
+            "x": 78.0,
+            "y": 14.25,
+            "w": 122,
+            "h": 224
+          },
+          "visiblePixels": 14477
+        },
+        {
+          "name": "chamber",
+          "source": {
+            "x": 1169,
+            "y": 235,
+            "w": 115,
+            "h": 224
+          },
+          "sourceAnchor": {
+            "x": 1219.0,
+            "y": 459
+          },
+          "bounds": {
+            "x": 60.25,
+            "y": 13.25,
+            "w": 115,
+            "h": 224
+          },
+          "visiblePixels": 13785
+        },
+        {
+          "name": "contact",
+          "source": {
+            "x": 1354,
+            "y": 243,
+            "w": 201,
+            "h": 217
+          },
+          "sourceAnchor": {
+            "x": 1412.5,
+            "y": 460
+          },
+          "bounds": {
+            "x": 23.5,
+            "y": 21.25,
+            "w": 201,
+            "h": 217
+          },
+          "visiblePixels": 15357
+        },
+        {
+          "name": "retract",
+          "source": {
+            "x": 1616,
+            "y": 235,
+            "w": 123,
+            "h": 225
+          },
+          "sourceAnchor": {
+            "x": 1667.5,
+            "y": 460
+          },
+          "bounds": {
+            "x": 63.75,
+            "y": 13.25,
+            "w": 123,
+            "h": 225
+          },
+          "visiblePixels": 14159
+        }
+      ],
+      "baseWalkAnchor": {
+        "x": 407.5,
+        "y": 608
+      }
+    },
+    "skinny": {
+      "row": 2,
+      "referenceHeight": 210,
+      "frames": [
+        {
+          "name": "contact-a",
+          "source": {
+            "x": 28,
+            "y": 462,
+            "w": 173,
+            "h": 212
+          },
+          "sourceAnchor": {
+            "x": 98.0,
+            "y": 674
+          },
+          "bounds": {
+            "x": 28.0,
+            "y": 18.5,
+            "w": 173,
+            "h": 212
+          },
+          "visiblePixels": 12563
+        },
+        {
+          "name": "step-a",
+          "source": {
+            "x": 257,
+            "y": 463,
+            "w": 162,
+            "h": 212
+          },
+          "sourceAnchor": {
+            "x": 317.0,
+            "y": 675
+          },
+          "bounds": {
+            "x": 35.25,
+            "y": 19.5,
+            "w": 162,
+            "h": 212
+          },
+          "visiblePixels": 12385
+        },
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 475,
+            "y": 463,
+            "w": 178,
+            "h": 212
+          },
+          "sourceAnchor": {
+            "x": 544.5,
+            "y": 675
+          },
+          "bounds": {
+            "x": 31.5,
+            "y": 19.5,
+            "w": 178,
+            "h": 212
+          },
+          "visiblePixels": 12762
+        },
+        {
+          "name": "step-b",
+          "source": {
+            "x": 715,
+            "y": 463,
+            "w": 142,
+            "h": 211
+          },
+          "sourceAnchor": {
+            "x": 774.0,
+            "y": 674
+          },
+          "bounds": {
+            "x": 49.75,
+            "y": 19.5,
+            "w": 142,
+            "h": 211
+          },
+          "visiblePixels": 11689
+        },
+        {
+          "name": "lift",
+          "source": {
+            "x": 967,
+            "y": 465,
+            "w": 110,
+            "h": 210
+          },
+          "sourceAnchor": {
+            "x": 1004.5,
+            "y": 675
+          },
+          "bounds": {
+            "x": 80.0,
+            "y": 21.5,
+            "w": 110,
+            "h": 210
+          },
+          "visiblePixels": 11895
+        },
+        {
+          "name": "chamber",
+          "source": {
+            "x": 1176,
+            "y": 465,
+            "w": 101,
+            "h": 210
+          },
+          "sourceAnchor": {
+            "x": 1219.5,
+            "y": 675
+          },
+          "bounds": {
+            "x": 67.25,
+            "y": 21.5,
+            "w": 101,
+            "h": 210
+          },
+          "visiblePixels": 11472
+        },
+        {
+          "name": "contact",
+          "source": {
+            "x": 1357,
+            "y": 473,
+            "w": 195,
+            "h": 203
+          },
+          "sourceAnchor": {
+            "x": 1412.0,
+            "y": 676
+          },
+          "bounds": {
+            "x": 26.5,
+            "y": 29.5,
+            "w": 195,
+            "h": 203
+          },
+          "visiblePixels": 12302
+        },
+        {
+          "name": "retract",
+          "source": {
+            "x": 1622,
+            "y": 466,
+            "w": 110,
+            "h": 210
+          },
+          "sourceAnchor": {
+            "x": 1668.5,
+            "y": 676
+          },
+          "bounds": {
+            "x": 69.75,
+            "y": 22.5,
+            "w": 110,
+            "h": 210
+          },
+          "visiblePixels": 11717
+        }
+      ],
+      "baseWalkAnchor": {
+        "x": 410.0,
+        "y": 901
+      }
+    },
+    "eco": {
+      "row": 3,
+      "referenceHeight": 205,
+      "frames": [
+        {
+          "name": "contact-a",
+          "source": {
+            "x": 24,
+            "y": 678,
+            "w": 178,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 93.0,
+            "y": 883
+          },
+          "bounds": {
+            "x": 24.0,
+            "y": 12.75,
+            "w": 178,
+            "h": 205
+          },
+          "visiblePixels": 15013
+        },
+        {
+          "name": "step-a",
+          "source": {
+            "x": 250,
+            "y": 678,
+            "w": 171,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 323.0,
+            "y": 883
+          },
+          "bounds": {
+            "x": 28.25,
+            "y": 12.75,
+            "w": 171,
+            "h": 205
+          },
+          "visiblePixels": 14738
+        },
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 476,
+            "y": 678,
+            "w": 177,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 547.0,
+            "y": 883
+          },
+          "bounds": {
+            "x": 32.5,
+            "y": 12.75,
+            "w": 177,
+            "h": 205
+          },
+          "visiblePixels": 14293
+        },
+        {
+          "name": "step-b",
+          "source": {
+            "x": 715,
+            "y": 678,
+            "w": 149,
+            "h": 204
+          },
+          "sourceAnchor": {
+            "x": 774.0,
+            "y": 882
+          },
+          "bounds": {
+            "x": 49.75,
+            "y": 12.75,
+            "w": 149,
+            "h": 204
+          },
+          "visiblePixels": 13946
+        },
+        {
+          "name": "lift",
+          "source": {
+            "x": 967,
+            "y": 678,
+            "w": 120,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 1005.0,
+            "y": 883
+          },
+          "bounds": {
+            "x": 80.0,
+            "y": 12.75,
+            "w": 120,
+            "h": 205
+          },
+          "visiblePixels": 13750
+        },
+        {
+          "name": "chamber",
+          "source": {
+            "x": 1167,
+            "y": 678,
+            "w": 115,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 1217.0,
+            "y": 883
+          },
+          "bounds": {
+            "x": 58.25,
+            "y": 12.75,
+            "w": 115,
+            "h": 205
+          },
+          "visiblePixels": 13182
+        },
+        {
+          "name": "contact",
+          "source": {
+            "x": 1359,
+            "y": 686,
+            "w": 194,
+            "h": 198
+          },
+          "sourceAnchor": {
+            "x": 1413.5,
+            "y": 884
+          },
+          "bounds": {
+            "x": 28.5,
+            "y": 20.75,
+            "w": 194,
+            "h": 198
+          },
+          "visiblePixels": 15132
+        },
+        {
+          "name": "retract",
+          "source": {
+            "x": 1622,
+            "y": 679,
+            "w": 117,
+            "h": 205
+          },
+          "sourceAnchor": {
+            "x": 1669.0,
+            "y": 884
+          },
+          "bounds": {
+            "x": 69.75,
+            "y": 13.75,
+            "w": 117,
+            "h": 205
+          },
+          "visiblePixels": 13310
+        }
+      ],
+      "baseWalkAnchor": {
+        "x": 395.25,
+        "y": 1199
+      }
+    }
+  }
+}

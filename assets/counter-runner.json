@@ -1,0 +1,60 @@
+{
+  "file": "counter-runner.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "runner": {
+      "row": 0,
+      "referenceHeight": 848,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 74,
+            "y": 68,
+            "w": 693,
+            "h": 840
+          },
+          "sourceAnchor": {
+            "x": 426.0,
+            "y": 908
+          },
+          "bounds": {
+            "x": 74,
+            "y": 68,
+            "w": 693,
+            "h": 840
+          },
+          "visiblePixels": 198387,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 892,
+            "y": 69,
+            "w": 454,
+            "h": 857
+          },
+          "sourceAnchor": {
+            "x": 1165.0,
+            "y": 926
+          },
+          "bounds": {
+            "x": 62,
+            "y": 69,
+            "w": 454,
+            "h": 857
+          },
+          "visiblePixels": 184895,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

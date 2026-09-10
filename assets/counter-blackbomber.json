@@ -1,0 +1,60 @@
+{
+  "file": "counter-blackbomber.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "blackbomber": {
+      "row": 0,
+      "referenceHeight": 775,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 189,
+            "y": 46,
+            "w": 618,
+            "h": 772
+          },
+          "sourceAnchor": {
+            "x": 488.5,
+            "y": 818
+          },
+          "bounds": {
+            "x": 189,
+            "y": 46,
+            "w": 618,
+            "h": 772
+          },
+          "visiblePixels": 196995,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1022,
+            "y": 46,
+            "w": 492,
+            "h": 778
+          },
+          "sourceAnchor": {
+            "x": 1316.0,
+            "y": 824
+          },
+          "bounds": {
+            "x": 108,
+            "y": 46,
+            "w": 492,
+            "h": 778
+          },
+          "visiblePixels": 185734,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

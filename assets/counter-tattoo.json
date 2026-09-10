@@ -1,0 +1,60 @@
+{
+  "file": "counter-tattoo.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "tattoo": {
+      "row": 0,
+      "referenceHeight": 774,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 190,
+            "y": 47,
+            "w": 616,
+            "h": 770
+          },
+          "sourceAnchor": {
+            "x": 487.5,
+            "y": 817
+          },
+          "bounds": {
+            "x": 190,
+            "y": 47,
+            "w": 616,
+            "h": 770
+          },
+          "visiblePixels": 182813,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1039,
+            "y": 44,
+            "w": 438,
+            "h": 778
+          },
+          "sourceAnchor": {
+            "x": 1301.0,
+            "y": 822
+          },
+          "bounds": {
+            "x": 117,
+            "y": 44,
+            "w": 438,
+            "h": 778
+          },
+          "visiblePixels": 163736,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

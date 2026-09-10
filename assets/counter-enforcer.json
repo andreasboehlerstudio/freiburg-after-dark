@@ -1,0 +1,60 @@
+{
+  "file": "counter-enforcer.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "enforcer": {
+      "row": 0,
+      "referenceHeight": 848,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 73,
+            "y": 62,
+            "w": 726,
+            "h": 836
+          },
+          "sourceAnchor": {
+            "x": 416.75,
+            "y": 898
+          },
+          "bounds": {
+            "x": 73,
+            "y": 62,
+            "w": 726,
+            "h": 836
+          },
+          "visiblePixels": 223014,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 863,
+            "y": 62,
+            "w": 509,
+            "h": 860
+          },
+          "sourceAnchor": {
+            "x": 1138.0,
+            "y": 922
+          },
+          "bounds": {
+            "x": 32,
+            "y": 62,
+            "w": 509,
+            "h": 860
+          },
+          "visiblePixels": 210420,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "file": "counter-extremist.png",
+  "width": 1536,
+  "height": 1024,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "extremist": {
+      "row": 0,
+      "referenceHeight": 870,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 79,
+            "y": 63,
+            "w": 692,
+            "h": 861
+          },
+          "sourceAnchor": {
+            "x": 420.5,
+            "y": 924
+          },
+          "bounds": {
+            "x": 79,
+            "y": 63,
+            "w": 692,
+            "h": 861
+          },
+          "visiblePixels": 221297,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 885,
+            "y": 63,
+            "w": 460,
+            "h": 880
+          },
+          "sourceAnchor": {
+            "x": 1167.25,
+            "y": 943
+          },
+          "bounds": {
+            "x": 57,
+            "y": 63,
+            "w": 460,
+            "h": 880
+          },
+          "visiblePixels": 204619,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "file": "counter-eco.png",
+  "width": 1774,
+  "height": 887,
+  "columns": 2,
+  "rowsCount": 1,
+  "background": "chroma-green",
+  "characters": {
+    "eco": {
+      "row": 0,
+      "referenceHeight": 786,
+      "frames": [
+        {
+          "name": "contact-b",
+          "source": {
+            "x": 166,
+            "y": 32,
+            "w": 663,
+            "h": 784
+          },
+          "sourceAnchor": {
+            "x": 446.5,
+            "y": 816
+          },
+          "bounds": {
+            "x": 166,
+            "y": 32,
+            "w": 663,
+            "h": 784
+          },
+          "visiblePixels": 190920,
+          "nearLeg": "trailing",
+          "farLeg": "leading"
+        },
+        {
+          "name": "passing-a",
+          "source": {
+            "x": 1038,
+            "y": 32,
+            "w": 472,
+            "h": 789
+          },
+          "sourceAnchor": {
+            "x": 1231.5,
+            "y": 821
+          },
+          "bounds": {
+            "x": 104,
+            "y": 32,
+            "w": 472,
+            "h": 789
+          },
+          "visiblePixels": 174658,
+          "nearLeg": "support",
+          "farLeg": "swing"
+        }
+      ]
+    }
+  }
+}

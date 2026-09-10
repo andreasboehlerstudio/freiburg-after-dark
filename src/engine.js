@@ -1,13 +1,13 @@
 import { HEROES, LEVELS, ENEMY_TYPES, HEAVY_KICK_TIMING, BAT_TIMING, THROW_TIMING, JUMP_KICK_TIMING, ITEM_TYPES } from './data.js';
 import { releasedPropPose, propHeightRange, batStrikeReach } from './prop-geometry.js';
+import { CAR_WIDTHS as CAR_WIDTH, CAR_DEPTH, STREET_CARS } from './street-layout.js';
 export { HEROES, LEVELS };
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*1.8);
 let serial=0;
 const uid=()=>++serial;
 const BOSS_PATTERNS={broker:['heavy','charge','heavy','slam'],enforcer:['heavy','slam','charge','charge'],baron:['slam','charge','slam','heavy'],bouncer:['heavy','heavy','charge','slam','heavy','slam']};
-const SPAWN_LANES=[468,548,628],MAX_ACTIVE_ENEMIES=3,ENTRY_MARGIN=150;
-const CAR_WIDTH={compact:300,luxury:360},CAR_DEPTH=24;
+const SPAWN_LANES=[468,548,628],MAX_ACTIVE_ENEMIES=3,ENTRY_MARGIN=320;
 
 export class Game {
  constructor({onEvent=()=>{},seed=0xf4e1}={}) { this.onEvent=onEvent; this.seed=seed>>>0;this.randomState=this.seed;this.mode='menu'; this.state={mode:'menu'}; this.time=0; this.enemies=[]; this.spawnQueue=[];this.spawnDelay=0;this.waveSpawned=null;this.effects=[]; this.pickups=[]; this.props=[];this.interactDown=false;this.camera=0; this.score=0; this.combo=0; this.stats={}; }
@@ -25,7 +25,11 @@ export class Game {
  loadLevel(index) {
   if(!Number.isInteger(index)||!LEVELS[index])throw new RangeError('Unbekanntes Level.');
   this.levelIndex=index;this.level=LEVELS[index];this.camera=0;this.enemies=[];this.effects=[];this.pickups=[];this.rescues=2;this.transition=0;this.defeatTimer=0;this.shake=0;
-  this.obstacles=[{model:'compact',x:640,y:500},{model:'luxury',x:1840,y:608},{model:'luxury',x:3020,y:500},{model:'luxury',x:4200,y:608}].map(car=>({...car,uid:uid(),kind:'car',hp:car.model==='compact'?125:180,maxHp:car.model==='compact'?125:180}));
+  this.obstacles=(STREET_CARS[this.level.id]||[]).map(car=>({...car,uid:uid(),kind:'car',hp:car.model==='compact'?125:180,maxHp:car.model==='compact'?125:180}));
+  this.residents=[];
+  for(let arena=0;arena<this.level.waves.length;arena++)for(let wave=1;wave<=this.level.waves[arena].length;wave++){
+   for(const entry of this.waveEntries(arena,wave))if(ENEMY_TYPES[entry.type]?.passive||ENEMY_TYPES[entry.type]?.kind==='passive')this.spawnEnemy({...entry,resident:true,arenaIndex:arena,wave});
+  }
   this.props=[.14,.43,.72].map((fraction,i)=>({uid:uid(),type:i===1?'bicycle':'bat',x:Math.round(this.level.width*fraction),y:555+i*23,z:0,rotation:0,state:'ground',durability:i===1?null:ITEM_TYPES.bat.durability}));
   this.player.x=230;this.player.y=555;this.partner.x=145;this.partner.y=610;
   for(const h of [this.player,this.partner]) {
@@ -37,36 +41,50 @@ export class Game {
   this.enterArena(0);this.emit('level',{index,name:this.level.name});
  }
  enterArena(index) { const span=this.level.width/this.level.waves.length;this.arena={index,left:index*span,right:(index+1)*span,cleared:false};this.spawnQueue=[];this.spawnDelay=0;this.waveSpawned=null;this.wave=1;this.waveDelay=.9;this.waitingWave=true;this.announcement=index===0?this.level.subtitle:'ARENA '+(index+1);this.announcementTime=2.2; }
+ waveEntries(arena,wave){
+  const waves=this.level.waves[arena],bossWave=arena===this.level.waves.length-1&&wave===waves.length,types=this.level.enemyRoster||Object.keys(ENEMY_TYPES);
+  return Array.from({length:waves[wave-1]},(_,order)=>({order,boss:bossWave&&order===0,type:bossWave&&order===0?this.level.bossType:types[(order+arena+wave+this.levelIndex)%types.length]}));
+ }
+ attackableEnemies(){return [...this.enemies,...(this.residents||[])];}
  spawnWave() {
   const waveKey=this.arena.index+':'+this.wave;if(this.waveSpawned===waveKey)return;
   const arenaWaves=this.level.waves[this.arena.index];const count=arenaWaves[this.wave-1];const bossWave=this.arena.index===this.level.waves.length-1&&this.wave===arenaWaves.length;
-  const types=this.level.enemyRoster||Object.keys(ENEMY_TYPES);
-  this.spawnQueue=Array.from({length:count},(_,order)=>({order,boss:bossWave&&order===0,type:bossWave&&order===0?this.level.bossType:types[(order+this.arena.index+this.wave+this.levelIndex)%types.length]}));
+  this.spawnQueue=this.waveEntries(this.arena.index,this.wave);
   this.spawnDelay=0;this.waveSpawned=waveKey;
   this.waitingWave=false;this.emit('wave',{wave:this.wave,arena:this.arena.index,boss:bossWave});this.announcement=bossWave?this.level.boss:'WELLE '+this.wave+' / '+arenaWaves.length;this.announcementTime=1.5;
   this.updateSpawnQueue(0);
  }
- spawnEnemy({order,boss,type}) {
+ spawnEnemy({order,boss,type,resident=false,arenaIndex=this.arena?.index||0,wave=this.wave||1}) {
   const d=boss?{name:this.level.boss,hp:420+Math.min(this.levelIndex,2)*100,speed:130+Math.min(this.levelIndex,2)*8,power:21+Math.min(this.levelIndex,2)*2,color:this.level.accent,range:115,telegraph:.9,kind:'heavy',...this.level.bossStats}:ENEMY_TYPES[type];
   const hp=d.hp*(boss?1:this.level.enemyHealthScale??1+Math.min(this.levelIndex,2)*.12);
-  const passive=d.passive||d.kind==='passive',side=(order+this.arena.index+this.wave+this.levelIndex)%2?1:-1;
-  let y=passive?628:SPAWN_LANES[(order*2+this.wave+this.arena.index)%SPAWN_LANES.length];
+  const passive=d.passive||d.kind==='passive',side=(order+arenaIndex+wave+this.levelIndex)%2?1:-1;
+  const seatKey=arenaIndex+':'+wave+':'+order;
+  const existing=passive&&!resident&&(this.residents||[]).find(e=>e.seatKey===seatKey&&e.type===type);
+  if(existing){
+   this.residents.splice(this.residents.indexOf(existing),1);
+   if(existing.hp>0||existing.deadTime>0)this.enemies.push(existing);
+   this.emit('enemy-enter',{uid:existing.uid,enemyType:type,boss,side,x:existing.x,y:existing.y,preplaced:true});return;
+  }
+  let y=passive?628:SPAWN_LANES[(order*2+wave+arenaIndex)%SPAWN_LANES.length];
   // Entrants start beyond both the viewport and the arena. Only this brief
   // approach may use the outer corridor; normal combat keeps the arena bounds.
-  let x=side<0?Math.min(this.camera-ENTRY_MARGIN,this.arena.left-ENTRY_MARGIN):Math.max(this.camera+1280+ENTRY_MARGIN,this.arena.right+ENTRY_MARGIN);
+  const span=this.level.width/this.level.waves.length,left=arenaIndex*span,right=left+span;
+  let x=side<0?Math.min(this.camera-ENTRY_MARGIN,left-ENTRY_MARGIN):Math.max(this.camera+1280+ENTRY_MARGIN,right+ENTRY_MARGIN);
   if(passive){
-   const living=[this.player,this.partner].filter(hero=>hero.hp>0);
-   const compact=this.obstacles.find(car=>car.model==='compact'&&car.x>this.arena.left+220&&car.x<this.arena.right-220);
-   if(compact)y=compact.y;
-   const candidates=compact?[compact.x-230,compact.x+230]:[this.arena.left+65,this.arena.right-65];
-   const clearance=position=>Math.min(...living.map(hero=>Math.hypot(position-hero.x,(y-hero.y)*1.8)));
-   x=candidates.sort((a,b)=>clearance(b)-clearance(a))[0];
-   if(clearance(x)<180){
-    const seats=candidates.flatMap(position=>[468,650].map(lane=>({x:position,y:lane,clearance:Math.min(...living.map(hero=>Math.hypot(position-hero.x,(lane-hero.y)*1.8)))})));
-    const seat=seats.sort((a,b)=>b.clearance-a.clearance)[0];x=seat.x;y=seat.y;
-   }
+   // Seated figures are part of the street from the first frame, including
+   // upcoming districts; activating their wave never creates a visible body.
+   const compact=this.obstacles.find(car=>car.model==='compact'&&car.x>left&&car.x<right);
+   const previous=(this.residents||[]).filter(e=>e.seatArena===arenaIndex).length;
+   x=left+span*(previous?.78:.48);y=previous?628:548;
+   if(compact){const gap=CAR_WIDTH.compact/2+85,candidates=[compact.x+gap,compact.x-gap].filter(position=>position>left+70&&position<right-70);x=candidates[previous%candidates.length]??left+80;y=compact.y;if(previous>=candidates.length)y=clamp(y+128,440,650);}
+   x=clamp(x,left+70,right-70);
+  }else{
+   // A wider car can also occupy an offscreen entrance. Choose a free lane
+   // before placing the actor, so collision never ejects a newly arrived body.
+   y=[y,...SPAWN_LANES.filter(lane=>lane!==y)].find(lane=>!this.obstacles.some(car=>car.hp>0&&Math.abs(car.x-x)<CAR_WIDTH[car.model]/2+32&&Math.abs(car.y-lane)<CAR_DEPTH+24))??468;
   }
   const enemy={...d,uid:uid(),id:type,type,isBoss:boss,x,y,z:0,vx:0,vy:0,facing:passive?1:-side,hp,maxHp:hp,state:'idle',entering:!passive,entrySide:side,invuln:0,hitstun:0,cooldown:.6,attackTime:0,attackDuration:0,attackKind:'',attackCount:0,deadTime:0};
+  if(resident){Object.assign(enemy,{seatKey,seatArena:arenaIndex});this.residents.push(enemy);return;}
   this.enemies.push(enemy);this.emit('enemy-enter',{uid:enemy.uid,enemyType:type,boss,side,x,y});
  }
  updateSpawnQueue(dt) {
@@ -86,7 +104,6 @@ export class Game {
   return true;
  }
  resolveObstacles(entity,fromX,fromY) {
-  if(entity.entering)return;
   for(const car of this.obstacles||[]){
    if(car.hp<=0)continue;
    const half=CAR_WIDTH[car.model]/2+16,depth=CAR_DEPTH+12;
@@ -111,7 +128,8 @@ export class Game {
     const half=CAR_WIDTH[car.model]/2+16,dx=car.x-entity.x,direction=Math.sign(input.x);
     if(car.hp<=0||dx*direction<0||Math.abs(dx)>half+85||Math.abs(entity.y-car.y)>CAR_DEPTH+16||(target.x-car.x)*direction<-half)continue;
     const options=[car.y-60,car.y+60].filter(y=>y>=440&&y<=650);
-    const y=options.sort((a,b)=>Math.abs(a-entity.y)-Math.abs(b-entity.y))[0];
+    const onClearEdge=Math.abs(dx)<half&&Math.abs(entity.y-car.y)>=CAR_DEPTH+12-.001;
+    const y=onClearEdge?entity.y:options.sort((a,b)=>Math.abs(a-entity.y)-Math.abs(b-entity.y))[0];
     route=entity.obstacleRoute={uid:car.uid,y,direction,exitX:car.x+direction*(half+35)};break;
    }
   }
@@ -153,7 +171,7 @@ export class Game {
    const previousX=prop.x;prop.age+=dt;prop.life-=dt;prop.x=clamp(prop.x+prop.vx*dt,20,this.level.width-20);prop.vz-=650*dt;prop.z=Math.max(0,prop.z+prop.vz*dt);prop.rotation+=Math.sign(prop.vx)*dt*(prop.type==='bicycle'?7:12);
    const source=[this.player,this.partner].find(h=>h.uid===prop.ownerUid),radius=prop.type==='bicycle'?48:30;
    const height=propHeightRange(prop);
-   if(source)for(const e of this.enemies){
+   if(source)for(const e of this.attackableEnemies()){
     if(e.hp<=0||prop.hitUids.has(e.uid)||height.top<8||height.bottom>(e.isBoss?268:211)||Math.abs(e.y-prop.y)>50||e.x<Math.min(previousX,prop.x)-radius||e.x>Math.max(previousX,prop.x)+radius)continue;
     if(this.hurt(e,prop.damage,source,prop.type==='bicycle'?320:230)){prop.hitUids.add(e.uid);this.emit('prop-hit',{hero:source.heroId,propType:prop.type,uid:prop.uid,targetUid:e.uid,x:e.x,y:e.y});}
    }
@@ -189,7 +207,7 @@ export class Game {
   let omni=false;
   if(kind==='special'){ range={nico:235,stefan:190,torsten:280,andreas:190}[h.heroId];depth=h.heroId==='torsten'?160:115;damage={nico:56,stefan:48,torsten:58,andreas:34}[h.heroId]*h.power;knock=390;omni=h.heroId!=='nico';this.effect('special',h.x,h.y,{color:h.color,life:.65,maxLife:.65,radius:range,heroId:h.heroId}); }
   if(h.isPartner)damage*=.8;
-  let hits=0;for(const e of this.enemies){if(e.hp<=0||h.attackHits.has(e.uid)||Math.abs(e.y-h.y)>depth||Math.abs(e.x-h.x)>range||(!omni&&(e.x-h.x)*h.attackFacing < -26))continue;h.attackHits.add(e.uid);if(this.hurt(e,damage,h,knock))hits++;}
+  let hits=0;for(const e of this.attackableEnemies()){if(e.hp<=0||h.attackHits.has(e.uid)||Math.abs(e.y-h.y)>depth||Math.abs(e.x-h.x)>range||(!omni&&(e.x-h.x)*h.attackFacing < -26))continue;h.attackHits.add(e.uid);if(this.hurt(e,damage,h,knock))hits++;}
   for(const car of this.obstacles||[]){const half=CAR_WIDTH[car.model]/2;if(car.hp<=0||h.attackHits.has(car.uid)||Math.abs(car.y-h.y)>depth+CAR_DEPTH||Math.abs(car.x-h.x)>range+half||(!omni&&(car.x-h.x)*h.attackFacing < -half-26))continue;h.attackHits.add(car.uid);if(this.hurtCar(car,damage,h))hits++;}
   if(hits&&kind==='bat'&&h.heldItem?.type==='bat'){h.heldItem.durability--;this.emit('prop-bat-hit',{hero:h.heroId,propType:'bat',uid:h.heldItem.uid,hits,x:h.x,y:h.y});if(h.heldItem.durability<=0){this.emit('prop-break',{hero:h.heroId,propType:'bat',uid:h.heldItem.uid,x:h.x,y:h.y});h.heldItem=null;}}
   if(hits&&kind==='jump-kick')this.emit('jump-hit',{hero:h.heroId,hits,x:h.x,y:h.y});
@@ -243,7 +261,7 @@ export class Game {
   if(e.entering){
    const left=this.arena.left+45,right=this.arena.right-45;
    if(e.x>=left&&e.x<=right)e.entering=false;
-   else{const target=e.x<left?left:right;e.facing=Math.sign(target-e.x);e.state='walk';e.x+=e.facing*Math.min(Math.abs(target-e.x),e.speed*dt);e.cooldown=Math.max(e.cooldown,.45);if(e.x===target)e.entering=false;return;}
+   else{const target=e.x<left?left:right;e.facing=Math.sign(target-e.x);e.state='walk';const move=this.obstacleInput(e,{x:target,y:e.y},{x:e.facing,y:0});e.x+=move.x*Math.min(Math.abs(target-e.x),e.speed*dt);e.y+=move.y*e.speed*.54*dt;e.cooldown=Math.max(e.cooldown,.45);if(e.x>=left&&e.x<=right)e.entering=false;return;}
   }
   if(e.state==='telegraph'){
    if(e.attackTime<=0){e.state='attack';e.attackDuration=e.type==='bouncer'?(e.attackKind==='charge'?.64:e.attackKind==='slam'?.58:.5):e.attackKind==='charge'?.62:.38;e.attackTime=e.attackDuration;e.didStrike=false;e.attackHits=new Set();this.emit('enemy-swing',{boss:e.isBoss,kind:e.attackKind});}return;
@@ -271,13 +289,15 @@ export class Game {
  update(dt,input={}) {
   if(this.mode!=='playing')return;dt=clamp(dt,0,.04);this.time+=dt;this.comboTimer-=dt;if(this.comboTimer<=0)this.combo=0;this.shake=Math.max(0,(this.shake||0)-dt);this.announcementTime=Math.max(0,(this.announcementTime||0)-dt);
   const interactPressed=!!input.interact&&!this.interactDown;this.interactDown=!!input.interact;
-  const all=[this.player,this.partner,...this.enemies];
+  const all=[this.player,this.partner,...this.attackableEnemies()];
   for(const e of all){e.motionStartX=e.x;e.motionStartY=e.y;e.walking=false;e.walkSpeed=0;}
   for(const e of all){e.invuln=Math.max(0,e.invuln-dt);e.hitstun=Math.max(0,e.hitstun-dt);e.cooldown=Math.max(0,e.cooldown-dt);if(e.attackTime>0){e.attackTime=Math.max(0,e.attackTime-dt);if(e.type==='hero'&&e.attackTime===0&&e.hp>0)e.state='idle';}if(e.hitstun>0||e.state==='dead'){e.x+=e.vx*dt;e.y+=e.vy*dt;e.vx*=Math.exp(-dt*7);} }
-  this.heroUpdate(this.player,dt,{...input,interact:interactPressed});this.heroUpdate(this.partner,dt,this.partnerInput(dt));for(const e of this.enemies)this.enemyUpdate(e,dt);
+  this.heroUpdate(this.player,dt,{...input,interact:interactPressed});this.heroUpdate(this.partner,dt,this.partnerInput(dt));for(const e of this.attackableEnemies())this.enemyUpdate(e,dt);
   const right=this.arena.cleared?Math.min(this.level.width,this.arena.right+220):this.arena.right-25;
   for(const e of all){
-   if(!e.entering)e.x=clamp(e.x,this.arena.left+20,right);e.y=clamp(e.y,440,650);this.resolveObstacles(e,e.motionStartX,e.motionStartY);
+   if(e.seatKey){const span=this.level.width/this.level.waves.length;e.x=clamp(e.x,e.seatArena*span+20,(e.seatArena+1)*span-25);}
+   else if(!e.entering)e.x=clamp(e.x,this.arena.left+20,right);
+   e.y=clamp(e.y,440,650);this.resolveObstacles(e,e.motionStartX,e.motionStartY);
    const travel=Math.hypot(e.x-e.motionStartX,e.y-e.motionStartY);
    // Only real grounded travel advances the gait: never hit knockback,
    // an arena clamp, a sidekick catch-up teleport, or holding against a wall.
