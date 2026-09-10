@@ -40,3 +40,8 @@ kbd{background:#20121a;color:var(--paper);border-color:#98303985;letter-spacing:
 .start-prompt kbd{font-size:.88cqw;padding:.15cqw .45cqw;background:#03080ab0;border-color:#ddd7c759;color:#eee6d9}
 .cinematic-menu .sr-only{position:absolute}
 @media(prefers-reduced-motion:reduce){.primary:active{transform:none}}
+
+/* Editorial HUD: controls sit beneath the score, clear of the combo. */
+#toolbar{top:13.6%;right:3.28%;bottom:auto;gap:6px}
+#toolbar button{width:clamp(28px,2.5cqw,36px);height:clamp(28px,2.5cqw,36px);font-size:clamp(13px,1.25cqw,18px);border:1px solid #eeeae521;background:#080b1266;color:#c8c2c2;border-radius:0}
+#toolbar button:hover{background:#29151dcc;border-color:#d93643;color:#eeeae5}

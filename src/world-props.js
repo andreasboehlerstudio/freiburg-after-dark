@@ -102,7 +102,7 @@ export function drawHeldProp(renderer, hero) {
   if (item.type === 'bat') renderer.drawHeroGrip?.(hero, pose);
 }
 
-export function drawPropHint(renderer) {
+export function propHint(renderer) {
   const { player, partner, mode } = renderer.game;
   if (!player || player.hp <= 0 || mode !== 'playing') return;
   if (partner?.state === 'down' && Math.abs(partner.x - player.x) < 95 && Math.abs(partner.y - player.y) < 55) return;
@@ -110,6 +110,5 @@ export function drawPropHint(renderer) {
   const nearby = item || (renderer.game.props || []).find(prop => prop.state === 'ground' && Math.abs(prop.x - player.x) < 90 && Math.abs(prop.y - player.y) < 55);
   if (!nearby) return;
   const text = item ? (item.type === 'bat' ? 'J SCHLAGEN · E WERFEN' : 'E / J FAHRRAD WERFEN') : `E ${nearby.type === 'bat' ? 'BASEBALLSCHLÄGER' : 'FAHRRAD'} AUFHEBEN`;
-  renderer.panel(435, 604, 410, 29, '#090c15df');
-  renderer.label(text, 640, 619, 14, '#fff1e8', 'center');
+  return text;
 }
