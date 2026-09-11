@@ -1,3 +1,4 @@
+import { loadImage, loadJSON, yieldForPaint } from './asset-loading.js';
 import { keyBouncerSheet } from './bouncer-animation.js';
 import { clipSpriteFrame } from './combat-animation.js';
 
@@ -26,11 +27,18 @@ export class LevelCelebration {
   this.image=null;this.metadata=null;this.background=null;
  }
  async load(){
-  const image=new Image(),url=new URL('../assets/celebration.png',import.meta.url);
-  image.src=url.href;
-  const [response]=await Promise.all([fetch(new URL('../assets/celebration.json',import.meta.url)),image.decode()]);
-  if(!response.ok)throw new Error('Siegesfeier-Metadaten fehlen.');
-  const metadata=await response.json(),characters=Object.values(metadata.characters||{});
+  if(this.image&&this.metadata)return this;
+  if(this.loading)return this.loading;
+  this.loading=this.loadAssets().finally(()=>{this.loading=null;});
+  return this.loading;
+ }
+ async loadAssets(){
+  this.rawImage ||= null;
+  const [metadata] = await Promise.all([
+   loadJSON('../assets/celebration.json',import.meta.url),
+   (async()=>{this.rawImage ||= await loadImage('../assets/celebration.png',import.meta.url);})(),
+  ]);
+  const image=this.rawImage,characters=Object.values(metadata.characters||{});
   if(characters.length!==3)throw new Error('Die Siegesfeier benötigt drei Figuren.');
   for(const character of characters){
    if(character.frames?.length!==3||!(character.referenceHeight>0))throw new Error('Jubelposen fehlen.');
@@ -39,7 +47,8 @@ export class LevelCelebration {
     if(!s||!a||![s.x,s.y,s.w,s.h,a.x,a.y].every(Number.isFinite)||s.w<=0||s.h<=0||s.x<0||s.y<0||s.x+s.w>image.width||s.y+s.h>image.height)throw new Error('Ungültige Jubelpose.');
    }
   }
-  this.image=keyBouncerSheet(image);this.metadata=metadata;return this;
+  await yieldForPaint();
+  this.image=keyBouncerSheet(image);this.metadata=metadata;this.rawImage=null;return this;
  }
  begin(renderer,game){
   // Draw the actual cleared street once, without the combat HUD or exit arrow.

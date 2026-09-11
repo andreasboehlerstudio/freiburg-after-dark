@@ -1,8 +1,10 @@
 # Freiburg After Dark
 
-Version 1.8.0 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg, mit einem Spieler und automatisch kämpfendem Sidekick.
+Version 1.8.1 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg, mit einem Spieler und automatisch kämpfendem Sidekick.
 
 Im Browser öffnen, „Spiel starten“ wählen, Hauptfigur und Sidekick auswählen und „Nacht starten“ drücken. Auf dem Startbildschirm läuft Musik als Loop; falls der Browser zunächst stumm bleibt, „Musik aktivieren“ anklicken. Beim Spielstart wird zur Levelmusik überblendet. In den Einstellungen lassen sich Musik, Effekte und Kampflaute getrennt regeln.
+
+Für einen schnelleren Start lädt zunächst nur das Hauptmenü. Charakterauswahl und Viertel folgen bei Bedarf, mit sichtbarem Ladefortschritt und einer Schaltfläche zum erneuten Versuch bei Verbindungsproblemen. Verlustfreie WebP-Dateien reduzieren die Bildübertragung; die Originalgrafiken bleiben als Ausweichformat erhalten.
 
 ## Steuerung
 

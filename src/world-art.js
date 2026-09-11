@@ -1,3 +1,4 @@
+import { loadImage as loadAssetImage, yieldForPaint } from './asset-loading.js';
 /**
  * Art direction for the three unique, left-to-right paintings of each level.
  * `ground` is the source image's normalized horizon/fighting-lane boundary.
@@ -69,15 +70,17 @@ function createSurface(width, height) {
   return canvas;
 }
 
+// Keep successful panels only until their world compiles, so retries reuse them
+// without retaining all 18 decoded paintings for the full campaign.
+const panels = new Map();
 async function loadImage(url) {
-  const image = new Image();
-  image.src = url.href;
+  if(panels.has(url.href))return panels.get(url.href);
   try {
-    await image.decode();
-  } catch (cause) {
-    throw new Error(`World artwork could not be loaded: ${url.pathname}`, { cause });
+    const image=await loadAssetImage(url,import.meta.url);
+    panels.set(url.href,image);return image;
+  } catch(cause) {
+    throw new Error(`World artwork could not be loaded: ${url.pathname}`,{cause});
   }
-  return image;
 }
 
 function drawRegion(context, image, region) {
@@ -102,7 +105,11 @@ export async function loadWorldArt(key, { sections = WORLD_ART[key] } = {}) {
     throw new Error('A complete world requires exactly three unique artwork sections.');
   }
   const urls = sections.map((_, index) => new URL(`../assets/worlds/${key}-${index}.png`, import.meta.url));
-  const images = await Promise.all(urls.map(loadImage));
+  const loaded = await Promise.allSettled(urls.map(loadImage));
+  const failed = loaded.find(value => value.status === 'rejected');
+  if(failed)throw failed.reason;
+  const images = loaded.map(value => value.value);
+  await yieldForPaint();
   const geometry = images.map((image, index) => worldArtSectionGeometry(image, sections[index]));
   const atlas = createSurface(WORLD_WIDTH, HEIGHT);
   const output = atlas.getContext('2d', { alpha: false });
@@ -130,5 +137,6 @@ export async function loadWorldArt(key, { sections = WORLD_ART[key] } = {}) {
     }
     output.drawImage(panel, index * PANEL_STEP, 0);
   }
+  for(const url of urls)panels.delete(url.href);
   return atlas;
 }

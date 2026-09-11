@@ -1,3 +1,4 @@
+import { loadImage, loadJSON, runLoadTasks } from './asset-loading.js';
 import { LampFlares, menuLamps } from './lamp-flares.js';
 const W=1280,H=720;
 const hash=n=>{const v=Math.sin(n*127.1+31.7)*43758.5453;return v-Math.floor(v)};
@@ -9,18 +10,28 @@ export class MenuScene {
     this.resize();window.addEventListener('resize',()=>this.resize());
   }
   resize(){const r=this.canvas.parentElement.getBoundingClientRect();this.canvas.width=Math.min(3840,Math.max(1280,Math.round((r.width||1280)*Math.min(devicePixelRatio||1,3))));this.canvas.height=Math.round(this.canvas.width*9/16);}
-  async load(){
-    const [heroes]=await Promise.all([
-      fetch(new URL('../assets/menu/heroes.json',import.meta.url)).then(async response=>{if(!response.ok)throw Error('Menüfiguren fehlen');return response.json();}),
-      Promise.all(['background','logo'].map(async name=>{const img=new Image();img.src=new URL('../assets/menu/'+(name==='logo'?'logo-alpha':'background-drawn')+'.png',import.meta.url).href;await img.decode();this.assets[name]=img;})),
-    ]);
-    if(!Array.isArray(heroes)||heroes.length!==4)throw Error('Vier Menüfiguren erforderlich');
-    // Individual cutouts use their own source pixels; records without a file
-    // keep the original shared atlas. Publish all four only after decoding.
-    const heroImages={};
-    await Promise.all([...new Set(heroes.map(hero=>hero.file||'heroes.png'))].map(async file=>{const img=new Image();img.src=new URL('../assets/menu/'+file,import.meta.url).href;await img.decode();heroImages[file]=img;}));
-    this.heroImages=heroImages;this.assets.heroes=heroImages['heroes.png'];this.heroes=heroes;
-    this.canvas.dataset.characters=String(this.heroes.length);
+  async load(onProgress){
+    if(this.heroes){onProgress?.({completed:7,total:7});return this;}
+    if(this.loading)return this.loading;
+    this.loading=(async()=>{
+      this.heroImages ||= {};
+      await runLoadTasks([
+        async()=>{this.heroRecords ||= await loadJSON('../assets/menu/heroes.json',import.meta.url);},
+        ...['background','logo'].map(name=>async()=>{
+          this.assets[name] ||= await loadImage('../assets/menu/'+(name==='logo'?'logo-alpha':'background-drawn')+'.png',import.meta.url);
+        }),
+        ...['nico','stefan','torsten','andreas'].map(id=>async()=>{
+          const file='hero-'+id+'.png';
+          this.heroImages[file] ||= await loadImage('../assets/menu/'+file,import.meta.url);
+        }),
+      ],onProgress);
+      const heroes=this.heroRecords;
+      if(!Array.isArray(heroes)||heroes.length!==4||heroes.some(hero=>!this.heroImages[hero.file]))throw Error('Vier Menüfiguren erforderlich');
+      this.heroes=heroes;
+      this.canvas.dataset.characters=String(heroes.length);
+      return this;
+    })().finally(()=>{this.loading=null;});
+    return this.loading;
   }
   drawLogo(canvas){
     if(!canvas)return;canvas.width=1400;canvas.height=596;const c=canvas.getContext('2d');c.clearRect(0,0,1400,596);

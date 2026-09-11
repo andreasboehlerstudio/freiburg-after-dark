@@ -11,6 +11,8 @@ import { drawWorldScene } from './world-scene.js';
 import { drawEnemySprite, isPassiveFighter } from './enemy-sprites.js';
 import { ENEMY_MOTION_ASSETS, ENEMY_COUNTER_ASSETS } from './enemy-motion.js';
 import { drawCarShadow, drawStreetCar } from './street-obstacles.js';
+import { loadImage, loadJSON, runLoadTasks, yieldForPaint } from './asset-loading.js';
+import { selectionPlan, levelPlan, fullPlan } from './load-plan.js';
 const W=1280,H=720, INK='#15151f';
 const COLORS={nico:'#ef1824',stefan:'#ef1824',torsten:'#ef1824',andreas:'#ef1824'};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -20,8 +22,47 @@ const hash=n=>{let v=Math.sin(n*127.1+311.7)*43758.5453;return v-Math.floor(v)};
 export class Renderer {
   constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.sceneLightingEnabled=true;this.motionPreference=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');this.metadata={};this.walkMetadata={};this.combatMetadata={};this.enemyMetadata={};this.propMetadata={};this.carMetadata={};this.resize();this._resize=()=>this.resize();window.addEventListener('resize',this._resize);}
   resize(){const r=this.canvas.getBoundingClientRect();const ratio=Math.min(window.devicePixelRatio||1,3);this.canvas.width=Math.min(3840,Math.max(1280,Math.round((r.width||1280)*ratio)));this.canvas.height=Math.round(this.canvas.width*9/16);}
-  async load(){this.fighterLighting?.clear();await Promise.all([...Object.keys(WORLD_ART),...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS,'nico','stefan','torsten','andreas','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk-nico','walk-stefan','walk-torsten','walk-andreas','combat-nico','combat-stefan','combat-torsten','combat-andreas'].map(async name=>{try{if(Object.hasOwn(WORLD_ART,name)){this.assets[name]=await loadWorldArt(name);return;}const img=new Image();const folder=Object.hasOwn(WORLD_ART,name)?'worlds/':'';img.src=new URL('../assets/'+folder+name+'.png',import.meta.url).href;await img.decode();this.assets[name]=[...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS,'bouncer','props','enemies-night-a','enemies-night-b','street-car'].includes(name)?keyBouncerSheet(img):img;}catch{}}));await Promise.all([...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS,'heroes','enemies','enemies-night-a','enemies-night-b','bosses','bouncer','props','street-car','walk','combat'].map(async name=>{try{const r=await fetch(new URL('../assets/'+name+'.json',import.meta.url));if(r.ok){const data=await r.json();if(name==='heroes')this.metadata=data;else if(name==='walk')this.walkMetadata=data;else if(name==='combat')this.combatMetadata=data;else if(name==='props')this.propMetadata=data;else if(name==='street-car')this.carMetadata=data;else this.enemyMetadata[name]=data;}}catch{}}));return this;}
-  reloadAssets(){return this.load();}
+  load(){return this.loadResources(fullPlan());}
+  loadSelection(onProgress){return this.loadResources(selectionPlan(),onProgress);}
+  loadLevel(index,heroIds,onProgress){return this.loadResources(levelPlan(index,heroIds),onProgress);}
+  async loadResources(plan,onProgress){
+    this.pendingResources ||= new Map();
+    this.loadedMetadata ||= new Set();
+    const ensure=(key,ready,work)=>{
+      if(ready())return Promise.resolve();
+      if(this.pendingResources.has(key))return this.pendingResources.get(key);
+      const task=Promise.resolve().then(work).finally(()=>this.pendingResources.delete(key));
+      this.pendingResources.set(key,task);return task;
+    };
+    const keyed=new Set([...ENEMY_MOTION_ASSETS,...ENEMY_COUNTER_ASSETS,'bouncer','props','enemies-night-a','enemies-night-b','street-car']);
+    await runLoadTasks([
+      ...plan.metadata.map(name=>()=>ensure('json:'+name,()=>this.loadedMetadata.has(name),async()=>{
+        const data=await loadJSON('../assets/'+name+'.json',import.meta.url);
+        if(name==='heroes')this.metadata=data;
+        else if(name==='walk')this.walkMetadata=data;
+        else if(name==='combat')this.combatMetadata=data;
+        else if(name==='props')this.propMetadata=data;
+        else if(name==='street-car')this.carMetadata=data;
+        else this.enemyMetadata[name]=data;
+        this.loadedMetadata.add(name);
+      })),
+      ...plan.images.map(name=>()=>ensure('image:'+name,()=>!!this.assets[name],async()=>{
+        const image=await loadImage('../assets/'+name+'.png',import.meta.url);
+        // Give progress and input a paint opportunity between expensive keying passes.
+        await yieldForPaint();
+        this.assets[name]=keyed.has(name)?keyBouncerSheet(image):image;
+      })),
+      ...plan.worlds.map(name=>()=>ensure('world:'+name,()=>!!this.assets[name],async()=>{
+        this.assets[name]=await loadWorldArt(name);
+      })),
+    ],onProgress);
+    return this;
+  }
+  retainWorld(index){
+    for(const key of Object.keys(WORLD_ART))if(key!==LEVELS[index]?.worldKey)delete this.assets[key];
+    this.fighterLighting?.clear();
+  }
+  reloadAssets(){this.assets={};this.loadedMetadata?.clear();return this.load();}
   render(game,dt=0){this.game=game||{};if(!this.game.mode||this.game.mode==="playing"||this.game.mode==="menu")this.time+=dt||1/60;this.c=this.ctx;const c=this.c;c.setTransform(this.canvas.width/W,0,0,this.canvas.height/H,0,0);c.clearRect(0,0,W,H);const level=this.levelIndex();const camera=this.game.camera?.x??this.game.camera??0;this.camera=Number(camera)||0;this.drawBackground(level);c.save();const shake=this.game.shake||this.game.screenShake||0;if(shake)c.translate(Math.sin(this.time*95)*Math.min(shake*28,5),Math.cos(this.time*111)*Math.min(shake*20,3));this.drawArena();this.drawWorldObjects();for(const fx of this.game.effects||[])this.effect(fx);c.restore();this.atmosphere(level);this.hud();}
   drawWorldObjects(){
     const entities=this.entities(),props=(this.game.props||[]).filter(prop=>['ground','thrown'].includes(prop.state)),cars=(this.game.obstacles||[]).filter(value=>value.kind==='car');
