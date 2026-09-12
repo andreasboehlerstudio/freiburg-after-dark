@@ -1,4 +1,6 @@
 const distance=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*1.8);
+// The world compiler places its pavement boundary at this logical canvas Y.
+export const CAMEO_GROUND_Y=458;
 
 // Friendly fictional game appearances. These captions are interface copy,
 // not quotations, endorsements or claims about the real people's behaviour.
@@ -10,17 +12,18 @@ export const NIGHTLIFE_CAMEOS=Object.freeze(Object.fromEntries([
 ].map(record=>[record.id,Object.freeze({...record,bonus:Object.freeze(record.bonus)})])));
 
 export const NIGHTLIFE_CAMEO_PLACEMENTS=Object.freeze({
- kajo:Object.freeze([Object.freeze({id:'pischko',arenaIndex:0})]),
- stuehlinger:Object.freeze([Object.freeze({id:'ticket',arenaIndex:0})]),
+ // These three positions leave the bicycles, bins and planters in the painting clear.
+ kajo:Object.freeze([Object.freeze({id:'pischko',arenaIndex:0,x:820})]),
+ stuehlinger:Object.freeze([Object.freeze({id:'ticket',arenaIndex:0,x:860})]),
  haslach:Object.freeze([Object.freeze({id:'ticket',arenaIndex:1})]),
- wiehre:Object.freeze([Object.freeze({id:'trueby',arenaIndex:1})]),
+ wiehre:Object.freeze([Object.freeze({id:'trueby',arenaIndex:1,x:1955})]),
  bermuda:Object.freeze([Object.freeze({id:'pischko',arenaIndex:0}),Object.freeze({id:'betty',arenaIndex:1}),Object.freeze({id:'trueby',arenaIndex:2})]),
 });
 
 export function createNightlifeCameos(level){
  const placements=NIGHTLIFE_CAMEO_PLACEMENTS[level?.id]||[];
  const span=level?.width/level?.waves?.length;
- return placements.map(({id,arenaIndex})=>({...NIGHTLIFE_CAMEOS[id],uid:`cameo:${level.id}:${id}`,type:'cameo',x:(arenaIndex+1)*span-100,y:420,z:0,arenaIndex,used:false,feedbackTime:0,animationTime:0}));
+ return placements.map(({id,arenaIndex,x=(arenaIndex+1)*span-100})=>({...NIGHTLIFE_CAMEOS[id],uid:`cameo:${level.id}:${id}`,type:'cameo',x,y:CAMEO_GROUND_Y,z:0,arenaIndex,used:false,feedbackTime:0,animationTime:0}));
 }
 
 export function updateNightlifeCameos(game,dt){
