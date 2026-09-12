@@ -12,7 +12,7 @@ export function storyForLevel(index,ids){
  const place=`LEVEL ${index+1} / ${LEVELS.length} · ${level.name}`;
  switch(level.id){
  case 'kajo':return [
-  scene(1,'Die letzte Runde','Eigentlich wollten Nico, Stefan, Torsten und Andreas Böhler nur ein Feierabendbier. Doch der Treffpunkt ist verwüstet. Ihr Freund fehlt. Jetzt übernimmt euer Team die Suche.',[[first,'Ein Bier. Mehr hatten wir nicht vor.'],[second,'Dann wird das wohl ein längerer Abend.']], 'FREIBURG · KURZ VOR MITTERNACHT'),
+  scene(1,'Die letzte Runde','Eigentlich wollten Nico, Stefan, Torsten und Andreas nur ein Feierabendbier. Doch der Treffpunkt ist verwüstet. Ihr Freund fehlt. Jetzt übernimmt euer Team die Suche.',[[first,'Ein Bier. Mehr hatten wir nicht vor.'],[second,'Dann wird das wohl ein längerer Abend.']], 'FREIBURG · KURZ VOR MITTERNACHT'),
   scene(2,'Eine letzte Nachricht','Auf dem Tresen liegt sein Handy: „Kommt ins Bermuda. Und bringt bloß nicht Stefan mit.“ Andreas sichert die Nachricht. Ein Kurier wurde zuletzt auf der KaJo gesehen.',[[ids?.includes('stefan')?'Stefan':first,ids?.includes('stefan')?'Jetzt erst recht.':'Dann gehen wir ihn suchen.'],[ids?.includes('andreas')?'Andreas':second,'Nachricht gesichert. Los.']],place)
  ];
  case 'stuehlinger':return [scene(3,'Die falsche Tasche','Dr. Rendites Spur führt in den Stühlinger. Ein Kurier trägt dieselbe schwarze Tasche wie euer Freund. Als ihr ihn ansprecht, rennt er los.',[[first,'Wir wollen nur kurz was fragen!'],[second,'Das sagen wir offenbar zu bedrohlich.']],place)];
