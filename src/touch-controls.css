@@ -1,0 +1,27 @@
+#touch-controls{position:fixed;inset:0;z-index:20;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;color:#f5f0e5}
+#touch-controls[hidden],#touch-controls:not([data-playing=true]) .touch-gamepad{display:none}
+.touch-stick{position:absolute;left:max(16px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:clamp(110px,19vw,148px);aspect-ratio:1;border-radius:50%;border:1px solid #f7f1e561;background:radial-gradient(circle,#100a10b0 38%,#100a1060 70%);pointer-events:auto;touch-action:none;display:grid;place-items:center}
+.touch-stick-knob{position:absolute;width:48%;height:48%;border-radius:50%;border:1px solid #ef394b9c;background:#bc142640;box-shadow:0 0 20px #ef102016}
+.touch-stick-cross{font:54px Arial;color:#ffffff2a}
+.touch-stick-label{position:absolute;bottom:9%;font:9px Arial;letter-spacing:.12em;color:#e4d8daa0}
+.touch-actions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,clamp(48px,7.6vw,68px));gap:8px;pointer-events:none}
+.touch-actions button{pointer-events:auto;touch-action:none;min-width:44px;min-height:44px;aspect-ratio:1;border:1px solid #ff496282;border-radius:50%;padding:2px;font:400 clamp(9px,1.3vw,12px) var(--display,Impact,sans-serif);letter-spacing:.02em;background:#12090dc4;color:#f5f0e5;box-shadow:0 2px 16px #0005}
+.touch-actions button[data-touch-action=attack]{background:#a21126ac;border-color:#ff586c}
+.touch-actions button[aria-pressed=true]{background:#e31634db;border-color:#fff;box-shadow:0 0 14px #eb173c7a}
+.touch-orientation{display:none}
+html[data-touch=true] #toolbar{top:max(8px,env(safe-area-inset-top));bottom:auto;right:2%;z-index:21}
+html[data-touch=true] #toolbar button{width:44px;height:44px;font-size:22px;background:#110c11a6;border:1px solid #ff496250;color:#f5f0e5}
+html[data-touch=true] #game{touch-action:none}
+@media(max-width:1000px){
+ html[data-touch=true] .primary,html[data-touch=true] .secondary{min-height:40px;min-width:74px;font-size:max(1.07cqw,11px)}
+ html[data-touch=true] .modal{width:88%;max-height:94%;overflow:auto}
+ html[data-touch=true] .modal .setting{font-size:13px;min-height:28px;margin:8px 0}
+ html[data-touch=true] .modal .small,html[data-touch=true] .modal .subline,html[data-touch=true] .modal .control-grid{font-size:11px}
+ html[data-touch=true] .setting select{font-size:13px;min-height:36px;background:#170e14;color:#fff}
+ html[data-touch=true] .setting input[type=checkbox]{width:20px;height:20px}
+ html[data-touch=true] .story-header button,html[data-touch=true] .story-footer button{min-height:40px;font-size:max(1.4cqw,11px)}
+ html[data-touch=true] .story-screen button small{font-size:max(.7cqw,8px)}
+ html[data-touch=true] .story-footer{bottom:1cqh}
+ html[data-touch=true] .tutorial-key-row small{font-size:max(.77cqw,9px)}
+}
+@media(orientation:portrait){.touch-orientation{display:block;position:absolute;bottom:24px;left:0;right:0;text-align:center;font:12px var(--display,Impact,sans-serif);letter-spacing:.08em;color:#dbbfc5}#touch-controls[data-playing=true] .touch-orientation{top:max(18px,env(safe-area-inset-top));bottom:auto}}

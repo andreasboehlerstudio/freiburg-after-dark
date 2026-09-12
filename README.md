@@ -1,6 +1,6 @@
 # Freiburg After Dark
 
-Version 1.10.3 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
+Version 1.11.0 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
 
 Im Browser öffnen und „Spiel starten“ wählen. Solo: Hauptfigur und Sidekick auswählen. Couch-Koop: „Tastatur links“ und „Tastatur rechts“ auswählen, um zu zweit ohne Controller zu spielen. Weitere Spieler können per Gamepad mit A beitreten; insgesamt bis zu vier. Danach erklärt ein Steuerungsbildschirm die wichtigsten Aktionen und führt zur Levelroute. Auf dem Startbildschirm läuft Musik als Loop; falls der Browser zunächst stumm bleibt, „Musik aktivieren“ anklicken. Beim Spielstart wird zur Levelmusik überblendet. In den Einstellungen lassen sich Musik, Effekte und Kampflaute getrennt regeln.
 
@@ -21,6 +21,10 @@ Für einen schnelleren Start lädt zunächst nur das Hauptmenü. Charakterauswah
 | Ausweichen | Umschalt | B |
 | Pause | Esc | Start |
 | Vollbild | F | Bildschirm-Schaltfläche |
+
+## Auf dem Handy
+
+Touch-Steuerung erscheint auf Touch-Geräten automatisch im Spiel. Links den Stick ziehen; rechts SCHLAG, TRITT, SPRUNG, AUSWEICHEN, SPEZIAL und GREIFEN. Mehrere Finger können gleichzeitig laufen und angreifen. Für einen Sprungtritt SPRUNG und danach SCHLAG oder TRITT drücken. GREIFEN hebt auf und wirft; zum Aufhelfen halten. Pause und Vollbild sind oben rechts. Einstellungen: Touch-Steuerung Automatisch / An / Aus. Touch steuert Spieler 1, auch im lokalen Koop. Querformat wird empfohlen. Die Steuerungserklärung zeigt bei aktivem Touch die passenden Tasten. In Safari kann das Spiel über Teilen und Zum Home-Bildschirm als Web-App gestartet werden; die Verfügbarkeit hängt von der iOS-Version ab.
 
 ## Zwei an einer Tastatur
 
@@ -54,6 +58,6 @@ Schmale anamorphische Lichtstreifen sitzen direkt auf den Straßenlampen und fla
 
 Im Couch-Koop werden mehr Gegner und stärkere Bosse auf das Team abgestimmt. E / O / LB halten hilft einem gestürzten Teammitglied auf; nach zwölf Sekunden kostet die automatische Rückkehr eine gemeinsame Reserve. Sind alle am Boden, ist die Runde verloren. Ein getrennter Controller pausiert das Spiel bis zum erneuten Verbinden oder bewussten Zuweisen eines Ersatzcontrollers.
 
-Das Spiel und seine Gegnerrollen sind fiktional. Die Freiburger Schauplätze sind als Arcade-Kulissen interpretiert. Fortschritt und Einstellungen bleiben im Browser auf diesem Gerät. Desktop-Steuerung; der KI-Sidekick gehört zum Solomodus.
+Das Spiel und seine Gegnerrollen sind fiktional. Die Freiburger Schauplätze sind als Arcade-Kulissen interpretiert. Fortschritt und Einstellungen bleiben im Browser auf diesem Gerät. Tastatur, Gamepad und Touch; der KI-Sidekick gehört zum Solomodus.
 
 Die Schrift Anton wird mit ihrer OFL-Lizenz ausgeliefert; siehe assets/fonts/OFL-Anton.txt.
