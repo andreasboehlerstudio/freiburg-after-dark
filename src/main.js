@@ -1,3 +1,4 @@
+import {storyForLevel,storyEnding,storyHTML} from './story.js';
 import {LoadingFlow} from './loading-flow.js';
 import {migrateCampaignSave,CAMPAIGN_SAVE_VERSION} from './campaign-save.js';
 import {Game,HEROES,LEVELS} from './engine.js';
@@ -23,6 +24,7 @@ const loadingFlow=new LoadingFlow(),coopLobby=new CoopLobby(Object.keys(HEROES))
 const gamepads=()=>navigator.getGamepads?.()||[];
 let chosenMode='solo',requestedLevel=0,activeSession=null,lobbyFingerprint='',lobbyNotice='',disconnectFingerprint='',controllerReturn='playing';
 let menuReady=false,selectionReady=false,pendingLoad=null,pendingTutorial=null,pendingIntro=null,introGeneration=0,screenGeneration=0;
+let pendingStory=null,endingShown=false;
 let levelBaseline={index:0,score:0,time:0,kills:0};
 const game=new Game({onEvent:e=>{audio.play(e);if(e.type==='level'){levelBaseline={index:game.levelIndex,score:game.score,time:game.time,kills:game.stats.kills||0};save.level=Math.max(save.level,game.levelIndex);persist()}if(e.type==='victory'){save.wins++;save.high=Math.max(save.high,game.score);save.level=LEVELS.length-1;persist()}if(['wave','arena-clear','level-clear','level','defeat','victory','revive'].includes(e.type)){document.querySelector('#status').textContent=e.type==='level'?game.level?.name:e.type;testLog.push({type:e.type,time:game.time,level:game.levelIndex,x:Math.round(game.player?.x||0),camera:Math.round(game.camera),score:game.score});if(testLog.length>200)testLog.shift()}}});
 function portrait(target,id,pose=0){
@@ -41,7 +43,7 @@ function applyAudioSettings(){
  audio.setMusic(settings.music);
 }
 function syncAudio(){
- const menu=['menu','mode','coop','select','tutorial','level-intro'].includes(screen)||(game.mode==='menu'&&['settings','controls'].includes(screen));
+ const menu=['menu','mode','coop','select','tutorial','level-intro','story'].includes(screen)||(game.mode==='menu'&&['settings','controls'].includes(screen));
  audio.update(screen==='loading'?{mode:'loading',levelIndex:game.levelIndex,camera:game.camera}:game,{menu,celebrating:screen==='level-clear',visible:!document.hidden&&document.hasFocus()});
  updateMenuSound();
 }
@@ -71,7 +73,7 @@ function activateAudio(event){
 }
 addEventListener('pointerdown',activateAudio,{capture:true});
 addEventListener('keydown',activateAudio,{capture:true});
-function setScreen(name,html){const generation=++screenGeneration;if(screen==='level-clear'&&name!=='level-clear')celebration.stop();if(screen==='level-intro'&&name!=='level-intro'){levelIntro.stop();pendingIntro=null;introGeneration++;}if(screen==='tutorial'&&name!=='tutorial'){tutorial.stop();pendingTutorial=null;}screen=name;document.querySelector("#stage").dataset.screen=name;menuScene.setActive(['menu','mode','coop'].includes(name)||(game.mode==='menu'&&['settings','controls'].includes(name)));overlay.innerHTML=html;toolbar.hidden=name!=='playing';keys.clear();for(const k in pressedUntil)delete pressedUntil[k];overlay.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{if(generation===screenGeneration)act(b.dataset.action);}));overlay.querySelectorAll('canvas[data-hero]').forEach(c=>portrait(c,c.dataset.hero,Number(c.dataset.pose)||0));syncAudio();}
+function setScreen(name,html){const generation=++screenGeneration;if(screen==='story'&&name!=='story')pendingStory=null;if(screen==='level-clear'&&name!=='level-clear')celebration.stop();if(screen==='level-intro'&&name!=='level-intro'){levelIntro.stop();pendingIntro=null;introGeneration++;}if(screen==='tutorial'&&name!=='tutorial'){tutorial.stop();pendingTutorial=null;}screen=name;document.querySelector("#stage").dataset.screen=name;menuScene.setActive(['menu','mode','coop'].includes(name)||(game.mode==='menu'&&['settings','controls'].includes(name)));overlay.innerHTML=html;toolbar.hidden=name!=='playing';keys.clear();for(const k in pressedUntil)delete pressedUntil[k];overlay.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{if(generation===screenGeneration)act(b.dataset.action);}));overlay.querySelectorAll('canvas[data-hero]').forEach(c=>portrait(c,c.dataset.hero,Number(c.dataset.pose)||0));syncAudio();}
 function menu(){if(!menuReady)return;loadingFlow.cancel();pendingLoad=null;activeSession=null;celebration.stop();game.setMode('menu');testAuto=false;setScreen('menu',`<section class="cinematic-menu" aria-label="Hauptmenü"><h1 class="sr-only">Freiburg After Dark</h1><canvas class="menu-logo" role="img" aria-label="Freiburg After Dark"></canvas><nav class="cinematic-actions" aria-label="Spielmenü"><button class="cinematic-button is-selected" data-action="choose">Spiel starten</button><button class="cinematic-button" data-action="controls">Steuerung</button><button class="cinematic-button" data-action="settings">Einstellungen</button>${save.level>0?`<button class="cinematic-button continue" data-action="continue">Fortsetzen · Level ${save.level+1}/${LEVELS.length}</button>`:''}</nav><div class="start-prompt"><kbd>ENTER</kbd><span>ZUM STARTEN</span></div><p class="menu-campaign-info">${LEVELS.length} LEVEL · EINE NACHT</p><button id="menu-sound" class="menu-sound" data-action="menu-music" aria-label="Musik aktivieren" aria-pressed="false">MUSIK AKTIVIEREN</button></section>`);menuScene.drawLogo(overlay.querySelector('.menu-logo'));overlay.querySelectorAll('.cinematic-button').forEach(button=>{const select=()=>{overlay.querySelectorAll('.cinematic-button').forEach(b=>b.classList.toggle('is-selected',b===button));};button.addEventListener('pointerenter',select);button.addEventListener('focus',select);});}
 
 function showLoading(request,error=null){
@@ -199,8 +201,23 @@ function showLevelIntro(index,{confirm,back,bindings=null}){
  setScreen('level-intro',levelIntro.html(index));levelIntro.begin(index);
  overlay.querySelector('[data-action="level-start"]')?.focus({preventScroll:true});
 }
+function showStory(scenes,confirm,bindings=null){
+ if(!scenes.length){confirm();return;}
+ pendingStory={scenes,index:0,confirm,bindings};paintStory();
+}
+function paintStory(){
+ const request=pendingStory;if(!request)return;
+ setScreen('story',storyHTML(request.scenes,request.index));
+ overlay.querySelector('[data-action="story-next"]')?.focus({preventScroll:true});
+}
+function advanceStory(skip=false){
+ if(screen!=='story'||!pendingStory||document.hidden||!document.hasFocus())return;
+ const request=pendingStory;
+ if(!skip&&request.index+1<request.scenes.length){request.index++;paintStory();return;}
+ pendingStory=null;request.confirm();
+}
 function showPreparedLevel(snapshot){
- showLevelIntro(snapshot.level,{confirm:()=>beginGame(snapshot),back:()=>modeScreen(snapshot.level),bindings:snapshot.bindings});
+ showStory(storyForLevel(snapshot.level,snapshot.heroIds),()=>showLevelIntro(snapshot.level,{confirm:()=>beginGame(snapshot),back:()=>modeScreen(snapshot.level),bindings:snapshot.bindings}),snapshot.bindings);
 }
 function confirmLevelIntro(){
  if(screen!=='level-intro'||!pendingIntro||document.hidden||!document.hasFocus())return;
@@ -217,7 +234,7 @@ function beginGame(snapshot){
   coopLobby.restore(snapshot.bindings);chosenMode='coop';requestedLevel=snapshot.level;
   openCoop({notice:'Ein Controller fehlt. Verbindet euer Team vor dem Start erneut.'});return;
  }
- pendingTutorial=null;tutorial.stop();activeSession=snapshot;chosenMode=snapshot.cooperative?'coop':'solo';
+ endingShown=false;pendingTutorial=null;tutorial.stop();activeSession=snapshot;chosenMode=snapshot.cooperative?'coop':'solo';
  hero=snapshot.hero;partner=snapshot.partner;save.hero=hero;save.partner=partner;persist();
  celebration.stop();
  if(snapshot.cooperative)game.startCoop(snapshot.heroIds,snapshot.level);else game.start(hero,partner,snapshot.level);
@@ -258,7 +275,7 @@ function pause(){if(screen!=='playing'||game.mode!=='playing')return;game.pause(
 let returnScreen='menu';
 function controls(){returnScreen=game.mode==='paused'?'pause':'menu';setScreen('controls',`<div class="modal-backdrop"><section class="modal"><div class="eyebrow">Tastatur & Standard-Gamepad</div><h1>Mach die Straße frei.</h1>${game.cooperative?coopKeyboardHelp(activeSession?.bindings):''}<div class="control-grid"><div>Bewegen <kbd>${game.cooperative?'Stick / Steuerkreuz':'WASD / ↑↓←→'}</kbd></div><div>Schlag / Combo <kbd>${game.cooperative?'Pad X':'J · Pad X'}</kbd></div><div>Schwerer Tritt <kbd>${game.cooperative?'Pad Y':'K · Pad Y'}</kbd></div><div>Springen <kbd>${game.cooperative?'Pad A':'LEER · Pad A'}</kbd></div><div>Ausweichen <kbd>${game.cooperative?'Pad B':'SHIFT · Pad B'}</kbd></div><div>Spezial (45 Energie) <kbd>${game.cooperative?'Pad RB':'L · Pad RB'}</kbd></div><div>Aufheben / Werfen <kbd>${game.cooperative?'Pad LB':'E · Pad LB'}</kbd></div><div>Pause / Vollbild <kbd>ESC / F</kbd></div></div><p class="subline">${game.cooperative?'Schlagt mit C / J / Pad X für eine dreiteilige Combo.':'J für eine dreiteilige Combo mehrfach drücken oder halten.'} ${game.cooperative?'In der Luft Schlag oder Tritt für einen Sprungtritt. Links E, rechts O oder Pad LB hebt Gegenstände auf und wirft sie. Mit einem Schläger benutzt ihr die Schlagtaste.':'In der Luft J oder K für einen gezielten Sprungtritt. E hebt Fahrräder oder Baseballschläger auf; mit E wirfst du sie. Mit einem Schläger schlägst du per J zu.'} Gegner müssen auf derselben Höhe und vor dir stehen. Rote Markierungen kündigen Angriffe an: ausweichen oder aus der Linie gehen.</p><p class="small">${game.cooperative?'Im lokalen Koop steuert jeder seine eigene Figur. Neben einem gefallenen Mitspieler links E, rechts O oder am Gamepad LB halten, um ihn aufzuhelfen. Fällt das ganze Team, endet der Versuch.':'Dein Sidekick kämpft automatisch. Bei ihm E halten hilft schneller; sonst steht er nach 12 Sekunden auf. Er kann dich zweimal pro Level retten. Sind beide am Boden, endet der Versuch.'} Essen und Energiedrinks werden beim Darüberlaufen eingesammelt.</p><div class="actions"><button class="primary" data-action="close-sub">Verstanden</button></div></section></div>`)}
 function options(){returnScreen=game.mode==='paused'?'pause':'menu';setScreen('settings',`<div class="modal-backdrop"><section class="modal"><div class="eyebrow">Deine Nacht, dein Sound</div><h1>Einstellungen</h1><label class="setting">Lautstärke<input id="volume" aria-label="Lautstärke" type="range" min="0" max="100" value="${Math.round(settings.volume*100)}"></label>${[["musicVolume","Musik"],["effectsVolume","Treffer & Effekte"],["voiceVolume","Kampflaute"]].map(([id,label])=>`<label class="setting">${label}<input id="${id}" aria-label="${label}" type="range" min="0" max="100" value="${Math.round(settings[id]*100)}"></label>`).join('')}<label class="setting">Musik an<input id="music" type="checkbox" ${settings.music?'checked':''}></label><label class="setting">Kamerawackeln bei Treffern<input id="shake" type="checkbox" ${settings.shake?'checked':''}></label><p class="small">Lokaler Koop: zwei Spieler an einer Tastatur, insgesamt bis zu vier mit zusätzlichen Gamepads. Links: WASD, C/V/X, Leertaste, E, linke Shift. Rechts: Pfeile, J/K/L, Enter, O, rechte Shift. Auflösung folgt Fenster und Bildschirm bis 3840 × 2160. F schaltet Vollbild. Bei Fokusverlust pausiert das Spiel automatisch. Einstellungen und freigespielte Level werden auf diesem Gerät gespeichert.</p><div class="actions"><button class="primary" data-action="close-sub">Fertig</button><button class="secondary" data-action="fullscreen">Vollbild</button></div></section></div>`);document.querySelector('#volume').oninput=e=>{settings.volume=Number(e.target.value)/100;audio.setVolume(settings.volume);persist()};for(const id of ['musicVolume','effectsVolume','voiceVolume'])document.querySelector('#'+id).oninput=e=>{settings[id]=Number(e.target.value)/100;audio.setMix({music:settings.musicVolume,effects:settings.effectsVolume,voice:settings.voiceVolume});persist()};for(const id of ['music','shake'])document.querySelector('#'+id).onchange=e=>{settings[id]=e.target.checked;audio.setMusic(settings.music);persist()}}
-function result(){const win=game.mode==='victory';save.high=Math.max(save.high,game.score);persist();testAuto=false;setScreen(win?'victory':'defeat',`<div class="modal-backdrop"><section class="modal"><div class="eyebrow">${win?`${LEVELS.length} Viertel. Gemeinsam geschafft.`:'Die Nacht ist noch nicht vorbei.'}</div><h1>${win?'Freiburg atmet auf.':'Einmal tief durchatmen.'}</h1><p class="subline">${win?`${(game.heroes||[game.player,game.partner]).map(player=>HEROES[player.heroId].name).join(' & ')} haben alle ${LEVELS.length} Viertel befreit.`:'Dein Team ist am Boden. Starte dieses Level mit voller Kraft erneut.'}</p><div class="result-stats"><div><strong>${game.score.toLocaleString('de-DE')}</strong><span>PUNKTE</span></div><div><strong>${Math.floor(game.time/60)}:${String(Math.floor(game.time%60)).padStart(2,'0')}</strong><span>ZEIT</span></div><div><strong>${game.stats.kills||0}</strong><span>GEGNER</span></div></div><div class="actions"><button class="primary" data-action="${win?'new':'restart'}">${win?'Neue Nacht':'Level erneut versuchen'}</button><button class="secondary" data-action="menu">Hauptmenü</button></div></section></div>`)}
+function result(){const win=game.mode==='victory';if(win&&!endingShown){endingShown=true;showStory(storyEnding((game.heroes||[game.player,game.partner]).map(p=>p.heroId)),result,activeSession?.bindings);return;}save.high=Math.max(save.high,game.score);persist();testAuto=false;setScreen(win?'victory':'defeat',`<div class="modal-backdrop"><section class="modal"><div class="eyebrow">${win?`${LEVELS.length} Viertel. Gemeinsam geschafft.`:'Die Nacht ist noch nicht vorbei.'}</div><h1>${win?'Freiburg atmet auf.':'Einmal tief durchatmen.'}</h1><p class="subline">${win?`${(game.heroes||[game.player,game.partner]).map(player=>HEROES[player.heroId].name).join(' & ')} haben alle ${LEVELS.length} Viertel befreit.`:'Dein Team ist am Boden. Starte dieses Level mit voller Kraft erneut.'}</p><div class="result-stats"><div><strong>${game.score.toLocaleString('de-DE')}</strong><span>PUNKTE</span></div><div><strong>${Math.floor(game.time/60)}:${String(Math.floor(game.time%60)).padStart(2,'0')}</strong><span>ZEIT</span></div><div><strong>${game.stats.kills||0}</strong><span>GEGNER</span></div></div><div class="actions"><button class="primary" data-action="${win?'new':'restart'}">${win?'Neue Nacht':'Level erneut versuchen'}</button><button class="secondary" data-action="menu">Hauptmenü</button></div></section></div>`)}
 function fullscreen(){if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.querySelector('#stage').requestFullscreen().catch(()=>{})}
 function showLevelCelebration(){
  if(screen==='level-clear')return;
@@ -278,12 +295,14 @@ function continueCelebration(){
   if(game.mode==='victory')result();else{renderer.retainWorld(nextLevel);enterPlaying();}
  };
  if(nextLevel>=LEVELS.length){advance();return;}
- return runLoad({title:LEVELS[nextLevel].name,detail:'Das nächste Viertel wird vorbereitet.',load:progress=>loadPlayAssets(nextLevel,team,progress),ready:()=>showLevelIntro(nextLevel,{confirm:advance,back:()=>showLevelCelebration(),bindings:activeSession?.bindings})});
+ return runLoad({title:LEVELS[nextLevel].name,detail:'Das nächste Viertel wird vorbereitet.',load:progress=>loadPlayAssets(nextLevel,team,progress),ready:()=>showStory(storyForLevel(nextLevel,team),()=>showLevelIntro(nextLevel,{confirm:advance,back:()=>showLevelCelebration(),bindings:activeSession?.bindings}),activeSession?.bindings)});
 }
 function act(action){
  if(loadingFlow.busy&&action!=='menu')return;
  if(action.startsWith('coop-')){lobbyAction(action);return;}
  switch(action){
+  case'story-next':advanceStory();break;
+  case'story-skip':advanceStory(true);break;
   case'tutorial-start':startFromTutorial();break;
   case'tutorial-back':backFromTutorial();break;
   case'level-start':confirmLevelIntro();break;
@@ -338,6 +357,13 @@ addEventListener('keydown',e=>{heldKeys.add(e.code);inputSeen[e.code]=(inputSeen
   }
  }
  if(screen==='controller-lost'&&e.code==='Escape'){e.preventDefault();return;}
+ if(screen==='story'){
+  if(e.code==='Escape'){e.preventDefault();if(!e.repeat)advanceStory(true);return;}
+  if(e.code==='Enter'){e.preventDefault();if(!e.repeat){const focused=document.activeElement;if(focused?.matches('button:not(:disabled)')&&overlay.contains(focused))focused.click();else advanceStory();}return;}
+  if(e.code==='KeyF'&&!e.repeat){fullscreen();return;}
+  if(handled.includes(e.code)&&e.code!=='Space')e.preventDefault();
+  return;
+ }
  if(screen==='tutorial'||screen==='level-intro'){
   if(e.code==='Escape'){e.preventDefault();if(!e.repeat){if(screen==='tutorial')backFromTutorial();else backFromLevelIntro();}return;}
   if(e.code==='Enter'){
@@ -368,7 +394,7 @@ function input(){
  if(screen==='coop'){handleLobbyPads(frames);return{};}
  if(screen==='playing'&&activeSession?.cooperative&&coopLobby.missing(gamepads(),activeSession.bindings).length){showControllerLost();return[];}
  if(screen==='controller-lost'&&reconnectControllers(frames))return[];
- const assigned=activeSession?.cooperative?activeSession.bindings:pendingTutorial?.cooperative?pendingTutorial.bindings:pendingIntro?.bindings||null;
+ const assigned=activeSession?.cooperative?activeSession.bindings:pendingTutorial?.cooperative?pendingTutorial.bindings:pendingStory?.bindings||pendingIntro?.bindings||null;
  const uiFrames=assigned?frames.filter(frame=>assigned.some(slot=>slot.kind==='gamepad'&&slot.padIndex===frame.index)):frames;
  const pad=(screen==='playing'?uiFrames[0]:uiFrames.find(frame=>frame.edge(0)||['left','right','up','down'].some(key=>frame.moved(key))))||uiFrames[0];
  if(screen==='playing'){
@@ -421,7 +447,7 @@ function tick(now){
  }else if(screen==='level-intro')levelIntro.render(dt,{visible});
  else if(screen==='tutorial')tutorial.render(dt,{visible});
  else if(menuReady&&!menuScene.canvas.hidden)menuScene.render(dt);
- else if(screen==='loading'||!game.player){const c=canvas.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#070a10';c.fillRect(0,0,canvas.width,canvas.height);}
+ else if(screen==='loading'||screen==='story'||!game.player){const c=canvas.getContext('2d');c.setTransform(1,0,0,1,0,0);c.fillStyle='#070a10';c.fillRect(0,0,canvas.width,canvas.height);}
  else renderer.render(game,dt);
  game.shake=shake;syncAudio();frames++;if(now-fpsAt>700){fps=Math.round(frames*1000/(now-fpsAt));frames=0;fpsAt=now;if(isDev){dev.hidden=!['playing','level-clear'].includes(screen);dev.textContent=JSON.stringify({fps,mode:game.mode,celebration:{active:celebration.active,time:Number(celebration.time.toFixed(2)),ready:celebration.ready},hero:game.player?.heroId,partner:game.partner?.heroId,cooperative:!!game.cooperative,humanCount:game.humanCount||1,heroes:(game.heroes||[]).map(player=>({hero:player.heroId,hp:Math.round(player.hp),x:Math.round(player.x)})),level:game.levelIndex,arena:game.arena?.index,wave:game.wave,x:Math.round(game.player?.x||0),camera:Math.round(game.camera),hp:Math.round(game.player?.hp||0),partnerHp:Math.round(game.partner?.hp||0),held:game.player?.heldItem?.type||null,props:game.props?.map(p=>({type:p.type,state:p.state,x:Math.round(p.x),y:Math.round(p.y)})),attackKind:game.player?.attackKind,enemies:game.enemies?.filter(e=>e.hp>0).length,score:game.score,combo:game.combo,stats:game.stats,time:Math.round(game.time),buffer:[canvas.width,canvas.height],z:Math.round(game.player?.z||0),walk:{state:game.player?.state,active:game.player?.walking,distance:Math.round(game.player?.walkDistance||0),frame:renderer.walkFrame(game.player||{},hero),partnerDistance:Math.round(game.partner?.walkDistance||0)},combat:{...combatFrame(game.player),ready:!!renderer.assets['combat-'+hero],frames:renderer.combatMetadata[hero]?.frames?.length||0},inputSeen,auto:testAuto,rate:testRate,sound:{context:audio.ctx?.state,menu:audio.menu,celebrating:audio.celebrating,level:audio.level,voices:audio.voiceBuffers.size,errors:audio.errors,tracks:[...audio.tracks.values()].map(t=>({level:t.index,playing:t.playing,paused:t.media.paused,ready:t.media.readyState,loop:t.media.loop,time:Math.round(t.media.currentTime*10)/10}))},events:testLog.slice(-4)})}}}
 applyAudioSettings();
