@@ -1,15 +1,16 @@
-// Six original recordings, short stock-voice exertions and layered native combat Foley.
+// Original recordings for each district, short voice exertions and native combat Foley.
 const clamp=(value,fallback=0)=>Number.isFinite(Number(value))?Math.max(0,Math.min(1,Number(value))):fallback;
 export const MUSIC_TRACKS=Object.freeze([
  {id:'kajo',title:'KAJO / NACHTSCHICHT'},
  {id:'stuehlinger',title:'HINTER DEN GLEISEN'},
  {id:'park',title:'KIRCHPLATZ / SCHATTEN'},
+ {id:'dreisam',title:'DREISAM / GEGEN DIE STRÖMUNG'},
  {id:'haslach',title:'HAWEI / BETON'},
  {id:'wiehre',title:'WIEHRE / LETZTE VORSTELLUNG'},
  {id:'bermuda',title:'BERMUDA / TÜRSTEHER'},
 ].map(track=>Object.freeze({...track,url:new URL('../assets/audio/music/'+track.id+'.mp3',import.meta.url).href})));
 // The title screen owns a separate playhead even though it reuses this recording.
-export const MENU_TRACK=Object.freeze({id:'menu',title:'AFTER DARK / NACHTSTIMMUNG',url:MUSIC_TRACKS[5].url});
+export const MENU_TRACK=Object.freeze({id:'menu',title:'AFTER DARK / NACHTSTIMMUNG',url:MUSIC_TRACKS.find(track=>track.id==='bermuda').url});
 export const VOICE_BANKS=Object.freeze(Object.fromEntries(['agile','force','grit','deep'].map(bank=>[
  bank,Object.freeze(Array.from({length:6},(_,i)=>new URL('../assets/audio/voice/'+bank+'-'+(i+1)+'.wav',import.meta.url).href)),
 ])));

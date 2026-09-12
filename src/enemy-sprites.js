@@ -1,5 +1,6 @@
 import { clipSpriteFrame } from './combat-animation.js';
 import { enemyMotion, authoredEnemyPose } from './enemy-motion.js';
+import { LOCAL_ENEMY_IDS, isLocalEnemy, localEnemyMotion, localEnemyStagger } from './local-enemy-motion.js';
 
 export const ENEMY_ART = Object.freeze({
   hooligan: ['enemies', 0, 'hooligan'], suit: ['enemies', 1, 'suit'],
@@ -10,9 +11,28 @@ export const ENEMY_ART = Object.freeze({
   nightowl: ['enemies-night-b', 0, 'nightowl'], scrapper: ['enemies-night-b', 1, 'scrapper'],
   skinny: ['enemies-night-b', 2, 'skinny'], eco: ['enemies-night-b', 3, 'eco'],
   protester: ['enemies-night-b', 4, 'protester'],
+  ...Object.fromEntries(LOCAL_ENEMY_IDS.map(id => [id, ['enemies-local-' + id, 0, id]])),
 });
 
 export const isPassiveFighter = entity => entity.passive === true || entity.kind === 'passive' || (entity.enemyType || entity.type) === 'protester';
+export const hasAuthoredEnemyDown = isLocalEnemy;
+
+function localSpritePose(renderer, entity, sheet, key, image) {
+  const character = renderer.enemyMetadata[sheet]?.characters?.[key];
+  const motion = localEnemyMotion(entity), frame = character?.frames?.[motion.index];
+  const source = frame?.source, anchor = frame?.sourceAnchor;
+  if (!source || !anchor || !(character.referenceHeight > 0)) return null;
+  const height = Number.isFinite(entity.spriteHeight) && entity.spriteHeight > 0 ? entity.spriteHeight : entity.isBoss ? 250 : 211;
+  const scale = height / character.referenceHeight;
+  if (![source.x, source.y, source.w, source.h, anchor.x, anchor.y, scale].every(Number.isFinite) || source.w <= 0 || source.h <= 0 || source.x < 0 || source.y < 0 || source.x + source.w > image.width || source.y + source.h > image.height) return null;
+  const cellWidth = image.width / 4, cellHeight = image.height / 4;
+  const cellX = motion.index % 4 * cellWidth, cellY = Math.floor(motion.index / 4) * cellHeight;
+  const crossesCell = source.x < cellX || source.y < cellY || source.x + source.w > cellX + cellWidth || source.y + source.h > cellY + cellHeight;
+  if (crossesCell && !frame.clipRects?.some(rect => Array.isArray(rect) && rect.length === 4 && rect.every(Number.isFinite) && rect[2] > 0 && rect[3] > 0)) return null;
+  return { image, source, frame, index: motion.index, row: Math.floor(motion.index / 4), height, scale,
+    dx: (source.x - anchor.x) * scale, dy: (source.y - anchor.y) * scale,
+    dw: source.w * scale, dh: source.h * scale, moving: motion.action === 'walk', passive: false, motion, local: true };
+}
 
 /** Fixed skeleton scale and registered foot anchors, including cross-cell crops. */
 export function enemySpritePose(renderer, entity) {
@@ -21,6 +41,7 @@ export function enemySpritePose(renderer, entity) {
   if (!entry) return null;
   const [sheet, defaultRow, key] = entry, image = renderer.assets[sheet];
   if (!image) return null;
+  if (isLocalEnemy(entity)) return localSpritePose(renderer, entity, sheet, key, image);
   const metadata = renderer.enemyMetadata[sheet] || {};
   const character = metadata.characters?.[key] || metadata.rows?.[key] || metadata[key] || metadata.rows?.[defaultRow];
   const passive = isPassiveFighter(entity);
@@ -60,6 +81,7 @@ export function drawEnemySprite(renderer, entity) {
     ? motion ? motion.extension || 0 : Math.sin(Math.max(0, Math.min(1, (entity.attackTime || 0) / (entity.attackDuration || .4))) * Math.PI)
     : 0;
   c.save(); c.translate(progress * 3, 0);
+  if (pose.local) { const stagger = localEnemyStagger(entity, motion, renderer.motionPreference?.matches); c.translate(stagger.x, 0); c.rotate(stagger.angle); }
   if (!passive && entity.state === 'telegraph') { c.rotate(-.045); c.translate(-5, 0); }
   if (entity.state === 'hurt') { if (!passive) c.rotate(-.085); c.filter = 'brightness(1.4)'; }
   if (!passive && entity.state === 'attack' && entity.attackKind === 'slam') c.scale(1, .91);

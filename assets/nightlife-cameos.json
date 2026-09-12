@@ -1,0 +1,23 @@
+{
+  "pischko": {
+    "source": { "x": 28, "y": 54, "w": 639, "h": 803 },
+    "height": 210,
+    "background": "chroma-green"
+  },
+  "betty": {
+    "source": { "x": 728, "y": 12, "w": 403, "h": 858 },
+    "height": 240,
+    "background": "chroma-green"
+  },
+  "trueby": {
+    "source": { "x": 1198, "y": 81, "w": 552, "h": 786 },
+    "height": 210,
+    "background": "chroma-green"
+  },
+  "ticket": {
+    "asset": "cameo-ticket",
+    "source": { "x": 389, "y": 19, "w": 492, "h": 1201 },
+    "height": 210,
+    "background": "chroma-green"
+  }
+}

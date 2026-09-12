@@ -8,6 +8,7 @@ const hash = n => { const value = Math.sin(n * 127.1 + 31.7) * 43758.5453; retur
 // Source-space canopy positions reviewed in the actual paintings. Only these
 // trees shed an occasional leaf; there are no particles emitted by masonry.
 export const TREE_ART = {
+  dreisam: [[[0.084530854,0.061363636],[0.24260355,0.079545455],[0.969568893,0.184090909]],[[0.070160609,0.091116173]],[[0.032967033,0.065759637],[0.955198648,0.083900227]]],
   martinstor: [[[.397,.31],[.658,.34]], [[.465,.25]], [[.4,.43],[.708,.43],[.858,.49]]],
   stuehlinger: [[[.257,.33],[.71,.33]], [[.214,.21],[.779,.29]], [[.27,.22]]],
   park: [[[.045,.18],[.325,.18],[.59,.18],[.955,.18]], [[.145,.18],[.22,.18],[.828,.18]], [[.055,.2],[.145,.2],[.285,.2],[.39,.2],[.58,.2],[.9,.3]]],
@@ -52,7 +53,7 @@ export function mistPatches(level = 0, time = 0, reducedMotion = false) {
     return { x: 260 + index * 610 + Math.sin(t * .075 + phase) * 76,
       y: 467 + hash(seed + 2) * 52 + Math.sin(t * .09 + phase) * 7,
       width: 420 + hash(seed + 4) * 160, height: 34 + hash(seed + 7) * 24,
-      alpha: (key === 'park' ? .075 : .055) * (.82 + Math.sin(t * .11 + phase) * .18) };
+      alpha: (key === 'park' || key === 'dreisam' ? .075 : .055) * (.82 + Math.sin(t * .11 + phase) * .18) };
   });
 }
 

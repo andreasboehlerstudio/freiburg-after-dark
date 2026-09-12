@@ -1,4 +1,4 @@
-import { WORLD_ART, worldArtSectionGeometry } from './world-art.js';
+import { WORLD_ART, worldArtSectionGeometry, worldArtSourceRegion } from './world-art.js';
 import { LEVELS } from './data.js';
 import { LampFlares, practicalLightStrength } from './lamp-flares.js';
 
@@ -10,6 +10,8 @@ const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 // and lit shop windows in SOURCE space; the same crop as world-art.js maps
 // them into the continuous 4600 px world, including the final right crop.
 export const SCENE_LIGHT_ART = {
+  // Source-space measurements of the original 1183 x 1330 river atlas.
+  dreisam: [{"size":[1183,1330],"lights":[["Uferlaterne West",0.072696534,0.340909091,"amber","lamp",1,220],["Uferlaterne Ost",0.943364328,0.340909091,"amber","lamp",1,220],["Treppenlicht am Gegenufer",0.17920541,0.463636364,"amber","lamp",0.5,150],["Gegenufer beim Wohnhaus",0.340659341,0.440909091,"amber","lamp",0.45,145],["Gegenufer Mitte",0.449704142,0.438636364,"amber","lamp",0.6,160],["Gegenufer vor dem Fenster",0.553677092,0.445454545,"amber","lamp",0.4,140],["Gegenufer am Baum",0.622992392,0.440909091,"amber","lamp",0.55,150],["Gegenufer unter dem Münster",0.717666948,0.429545455,"amber","lamp",0.45,145],["Gegenufer rechts",0.857988166,0.438636364,"amber","lamp",0.55,155]]},{"size":[1183,1330],"lights":[["Brückenufer West",0.073541843,0.298405467,"amber","lamp",1,220],["Brückenufer Ost",0.943364328,0.298405467,"amber","lamp",1,220],["Brückenlaterne am Aufgang",0.16737109,0.184510251,"amber","lamp",0.5,155],["Brückenlaterne West",0.271344041,0.234624146,"amber","lamp",0.65,170],["Brückenlaterne Mitte",0.43364328,0.248291572,"amber","lamp",0.75,180],["Brückenlaterne Ost",0.56043956,0.300683371,"amber","lamp",0.65,165],["Brückenlaterne am Geländer",0.648351648,0.330296128,"amber","lamp",0.5,150],["Uferlaterne hinter der Brücke",0.874894336,0.348519362,"amber","lamp",0.5,150],["Blaue Brückenunterseite West",0.262045647,0.421412301,"cyan","window",1,255],["Blaue Brückenunterseite Mitte",0.436179205,0.444191344,"cyan","window",1.05,285],["Blaue Brückenunterseite Ost",0.612003381,0.460136674,"cyan","window",1,250]]},{"size":[1183,1330],"lights":[["Uferlaterne am Graffiti",0.0693153,0.290249433,"amber","lamp",1,220],["Uferlaterne an der Weide",0.943364328,0.290249433,"amber","lamp",1,220],["Gegenufer vor dem Altbau",0.130177515,0.335600907,"amber","lamp",0.55,160],["Gegenufer an der Mauer",0.590870668,0.31292517,"amber","lamp",0.7,175],["Rotes Fenster am Uferhaus",0.839391378,0.129251701,"red","window",0.55,140]]}],
   martinstor: [
     { size: [2170, 725], lights: [
       ['Hirsch / rote Fenster', .125, .625, 'red', 'window'],
@@ -192,10 +194,11 @@ export const SCENE_LIGHT_ART = {
 export function mapScenePoint(key, section, u, v) {
   const { size } = SCENE_LIGHT_ART[key][section];
   const geometry = worldArtSectionGeometry({ width: size[0], height: size[1] }, WORLD_ART[key][section]);
+  const source = worldArtSourceRegion({ width: size[0], height: size[1] }, WORLD_ART[key][section]);
   const region = v < WORLD_ART[key][section].ground ? geometry.architecture : geometry.floor;
   const { source: s, destination: d } = region;
-  const panelX = d.x + (u * size[0] - s.x) / s.width * d.width;
-  const y = d.y + (v * size[1] - s.y) / s.height * d.height;
+  const panelX = d.x + (source.x + u * source.width - s.x) / s.width * d.width;
+  const y = d.y + (source.y + v * source.height - s.y) / s.height * d.height;
   // Later paintings cover the final 100 px of the preceding painting. Do
   // not relight a lamp that has been cropped out or covered by that overlap.
   const visible = panelX >= (section ? 55 : 0) && panelX < (section < 2 ? 1550 : 1600) && y >= 0 && y <= 720;

@@ -103,12 +103,17 @@ export function drawHeldProp(renderer, hero) {
 }
 
 export function propHint(renderer) {
-  const { player, partner, mode } = renderer.game;
-  if (!player || player.hp <= 0 || mode !== 'playing') return;
-  if (partner?.state === 'down' && Math.abs(partner.x - player.x) < 95 && Math.abs(partner.y - player.y) < 55) return;
+  const { mode, cooperative } = renderer.game, heroes = renderer.heroes();
+  if (mode !== 'playing') return;
+  const nearbyProp = hero => typeof renderer.game.getNearbyProp === 'function'
+    ? renderer.game.getNearbyProp(hero)
+    : (renderer.game.props || []).find(prop => prop.state === 'ground' && Math.abs(prop.x - hero.x) <= 90 && Math.abs(prop.y - hero.y) <= 55);
+  const canUse = hero => hero?.hp > 0 && !(hero.z > 0) && !heroes.some(ally => ally !== hero && ally.hp <= 0 && Math.hypot(ally.x - hero.x, (ally.y - hero.y) * 1.8) < 115);
+  const player = cooperative ? heroes.find(hero => canUse(hero) && (hero.heldItem || nearbyProp(hero))) : renderer.game.player;
+  if (!canUse(player)) return;
   const item = player.heldItem;
-  const nearby = item || (renderer.game.props || []).find(prop => prop.state === 'ground' && Math.abs(prop.x - player.x) < 90 && Math.abs(prop.y - player.y) < 55);
+  const nearby = item || nearbyProp(player);
   if (!nearby) return;
   const text = item ? (item.type === 'bat' ? 'J SCHLAGEN · E WERFEN' : 'E / J FAHRRAD WERFEN') : `E ${nearby.type === 'bat' ? 'BASEBALLSCHLÄGER' : 'FAHRRAD'} AUFHEBEN`;
-  return text;
+  return cooperative ? `${player.playerIndex + 1}P · ${text.replaceAll('J', 'J / X').replaceAll('E ', 'E / LB ')}` : text;
 }

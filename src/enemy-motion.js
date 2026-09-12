@@ -1,3 +1,4 @@
+import { localEnemyMotion, isLocalEnemy } from './local-enemy-motion.js';
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 export const ENEMY_GAIT_DISTANCE = 88;
 export const ENEMY_MOTION_GROUPS = Object.freeze(['night-a','night-b','original','bosses']);
@@ -7,6 +8,7 @@ const groups = Object.freeze({ enemies:'original',bosses:'bosses','enemies-night
 
 /** Select authored drawings, never a deformed or cross-faded body. */
 export function enemyMotion(entity, sheet, key) {
+  if(isLocalEnemy(entity))return localEnemyMotion(entity);
   if(entity.passive || entity.kind==='passive' || entity.type==='protester')return null;
   const group=groups[sheet];if(!group)return null;
   if(entity.state==='walk' && entity.walking && entity.walkSpeed>.01){

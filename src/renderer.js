@@ -8,9 +8,12 @@ import { FighterLighting } from './fighter-lighting.js';
 import { SceneLighting, sampleSceneLighting } from './scene-lighting.js';
 import { WorldAmbience } from './world-ambience.js';
 import { drawWorldScene } from './world-scene.js';
-import { drawEnemySprite, isPassiveFighter } from './enemy-sprites.js';
+import { drawEnemySprite, isPassiveFighter, hasAuthoredEnemyDown } from './enemy-sprites.js';
 import { ENEMY_MOTION_ASSETS, ENEMY_COUNTER_ASSETS } from './enemy-motion.js';
+import { LOCAL_ENEMY_ASSETS } from './local-enemy-motion.js';
+import { keyLocalEnemySheet } from './local-enemy-art.js';
 import { drawCarShadow, drawStreetCar } from './street-obstacles.js';
+import { drawNightlifeCameos } from './cameo-rendering.js';
 import { loadImage, loadJSON, runLoadTasks, yieldForPaint } from './asset-loading.js';
 import { selectionPlan, levelPlan, fullPlan } from './load-plan.js';
 const W=1280,H=720, INK='#15151f';
@@ -20,7 +23,7 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const hash=n=>{let v=Math.sin(n*127.1+311.7)*43758.5453;return v-Math.floor(v)};
 
 export class Renderer {
-  constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.sceneLightingEnabled=true;this.motionPreference=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');this.metadata={};this.walkMetadata={};this.combatMetadata={};this.enemyMetadata={};this.propMetadata={};this.carMetadata={};this.resize();this._resize=()=>this.resize();window.addEventListener('resize',this._resize);}
+  constructor(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets={};this.time=0;this.sceneLightingEnabled=true;this.motionPreference=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');this.metadata={};this.walkMetadata={};this.combatMetadata={};this.enemyMetadata={};this.propMetadata={};this.carMetadata={};this.cameoMetadata={};this.resize();this._resize=()=>this.resize();window.addEventListener('resize',this._resize);}
   resize(){const r=this.canvas.getBoundingClientRect();const ratio=Math.min(window.devicePixelRatio||1,3);this.canvas.width=Math.min(3840,Math.max(1280,Math.round((r.width||1280)*ratio)));this.canvas.height=Math.round(this.canvas.width*9/16);}
   load(){return this.loadResources(fullPlan());}
   loadSelection(onProgress){return this.loadResources(selectionPlan(),onProgress);}
@@ -43,6 +46,7 @@ export class Renderer {
         else if(name==='combat')this.combatMetadata=data;
         else if(name==='props')this.propMetadata=data;
         else if(name==='street-car')this.carMetadata=data;
+        else if(name==='nightlife-cameos')this.cameoMetadata=data;
         else this.enemyMetadata[name]=data;
         this.loadedMetadata.add(name);
       })),
@@ -50,7 +54,7 @@ export class Renderer {
         const image=await loadImage('../assets/'+name+'.png',import.meta.url);
         // Give progress and input a paint opportunity between expensive keying passes.
         await yieldForPaint();
-        this.assets[name]=keyed.has(name)?keyBouncerSheet(image):image;
+        this.assets[name]=LOCAL_ENEMY_ASSETS.includes(name)?keyLocalEnemySheet(image):name==='nightlife-cameos'||name==='cameo-ticket'?keyLocalEnemySheet(image,{columns:name==='nightlife-cameos'?3:1,rows:1}):keyed.has(name)?keyBouncerSheet(image):image;
       })),
       ...plan.worlds.map(name=>()=>ensure('world:'+name,()=>!!this.assets[name],async()=>{
         this.assets[name]=await loadWorldArt(name);
@@ -65,6 +69,7 @@ export class Renderer {
   reloadAssets(){this.assets={};this.loadedMetadata?.clear();return this.load();}
   render(game,dt=0){this.game=game||{};if(!this.game.mode||this.game.mode==="playing"||this.game.mode==="menu")this.time+=dt||1/60;this.c=this.ctx;const c=this.c;c.setTransform(this.canvas.width/W,0,0,this.canvas.height/H,0,0);c.clearRect(0,0,W,H);const level=this.levelIndex();const camera=this.game.camera?.x??this.game.camera??0;this.camera=Number(camera)||0;this.drawBackground(level);c.save();const shake=this.game.shake||this.game.screenShake||0;if(shake)c.translate(Math.sin(this.time*95)*Math.min(shake*28,5),Math.cos(this.time*111)*Math.min(shake*20,3));this.drawArena();this.drawWorldObjects();for(const fx of this.game.effects||[])this.effect(fx);c.restore();this.atmosphere(level);this.hud();}
   drawWorldObjects(){
+    drawNightlifeCameos(this);
     const entities=this.entities(),props=(this.game.props||[]).filter(prop=>['ground','thrown'].includes(prop.state)),cars=(this.game.obstacles||[]).filter(value=>value.kind==='car');
     for(const car of cars)drawCarShadow(this,car);
     for(const prop of props)drawPropShadow(this,prop);
@@ -89,7 +94,7 @@ export class Renderer {
   shadow(e){if(e.state==='dead')return;const x=e.x-this.camera,y=e.y;const z=e.z||0;(this.fighterLighting ||= new FighterLighting()).drawContact(this.c,e,x,{wet:true,lights:this.lightsFor(e)});if(e.state==='telegraph'){const p=1-clamp((e.attackTime||0)/Math.max(.1,e.attackDuration||.65),0,1);const slam=e.attackKind==='slam',charge=e.attackKind==='charge';this.ellipse(x+(slam?0:(e.facing||1)*55),y,slam?155:65+20*p,slam?58:20,'rgba(255,63,66,.15)','#ff785c',3);if(charge){const d=e.facing||1;this.path([[x+d*45,y-19],[x+d*200,y-19],[x+d*200,y-34],[x+d*248,y],[x+d*200,y+34],[x+d*200,y+19],[x+d*45,y+19]],'rgba(239,85,71,.30)','#ff9b75',2);}this.label(slam?'BODENWELLE':charge?'ANSTURM':'!',x,y-(e.isBoss?270:(e.spriteHeight||211)+26),e.isBoss?14:29,'#fff0ba','center');}}
   isHero(e){return e.type==='hero'||e.isHero||this.heroes().includes(e)||['nico','stefan','torsten','andreas'].includes(e.heroId||e.id);}
   heroId(e){return e.heroId||e.characterId||e.hero||e.id;}
-  drawEntity(e){const x=e.x-this.camera;if(x<-180||x>W+180)return;const c=this.c;c.save();c.translate(x,e.y-(e.z||0));const facing=e.state==='attack'?(e.attackFacing??e.facing??1):(e.facing||1);c.scale(facing,1);if(e.state==='down'||e.state==='dead'){if(!isPassiveFighter(e)){c.translate(0,-11);c.rotate(-Math.PI/2);c.scale(.9,.9);}c.globalAlpha=e.state==='dead'?.35:1;}const hero=this.isHero(e);const id=this.heroId(e);c.save();if(hero&&this.assets[id])this.drawHero(e,id);else if(hero||!this.drawEnemySprite(e))this.drawFighter(e,hero);c.restore();if(hero)drawHeldProp(this,e);c.restore();if(hero&&e.state==='down'){this.label('AM BODEN',x,e.y-65,11,'#d5cfd0','center');}if(!hero&&e.hp>0&&!e.isBoss&&!isPassiveFighter(e)){const w=56;this.bar(x-w/2,e.y-(e.z||0)-(e.spriteHeight||211)-14,w,3,e.hp/(e.maxHp||e.hp),'#d93643');}}
+  drawEntity(e){const x=e.x-this.camera;if(x<-180||x>W+180)return;const c=this.c;c.save();c.translate(x,e.y-(e.z||0));const facing=e.state==='attack'?(e.attackFacing??e.facing??1):(e.facing||1);c.scale(facing,1);if(e.state==='down'||e.state==='dead'){if(!isPassiveFighter(e)&&!hasAuthoredEnemyDown(e)){c.translate(0,-11);c.rotate(-Math.PI/2);c.scale(.9,.9);}c.globalAlpha=e.state==='dead'?.35:1;}const hero=this.isHero(e);const id=this.heroId(e);c.save();if(hero&&this.assets[id])this.drawHero(e,id);else if(hero||!this.drawEnemySprite(e))this.drawFighter(e,hero);c.restore();if(hero)drawHeldProp(this,e);c.restore();if(hero&&e.state==='down'){this.label('AM BODEN',x,e.y-65,11,'#d5cfd0','center');}if(!hero&&e.hp>0&&!e.isBoss&&!isPassiveFighter(e)){const w=56;this.bar(x-w/2,e.y-(e.z||0)-(e.spriteHeight||211)-14,w,3,e.hp/(e.maxHp||e.hp),'#d93643');}}
   drawHeroGrip(e,pose){
     const id=this.heroId(e);if(!this.assets[id]||!Number.isFinite(pose.gripX)||!Number.isFinite(pose.gripY))return;
     const c=this.c;c.save();c.beginPath();c.ellipse(pose.gripX,pose.gripY,6,5,0,0,Math.PI*2);c.clip();this.drawHero(e,id);c.restore();

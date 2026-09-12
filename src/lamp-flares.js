@@ -8,10 +8,24 @@ function surface(width, height) {
   canvas.width = width; canvas.height = height; return canvas;
 }
 
-/** Slow, tiny variation in the practical, never a flicker/strobe. */
+const noiseHash = value => { const n = Math.sin(value * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
+function smoothNoise(seed, time) {
+  const step = Math.floor(time), progress = time - step;
+  const fade = progress * progress * (3 - 2 * progress);
+  const a = noiseHash(seed + step * 7.13), b = noiseHash(seed + (step + 1) * 7.13);
+  return (a + (b - a) * fade) * 2 - 1;
+}
+
+/** Each bulb has its own gentle irregular shimmer. Interpolated noise avoids
+ * hard on/off frames; even its extrema stay within 6.5% of normal exposure. */
 export function practicalLightStrength(light, time = 0, reducedMotion = false) {
-  const phase = light.x * .013 + light.y * .009;
-  return (light.strength ?? 1) * (reducedMotion ? 1 : 1 + .027 * Math.sin(time * .47 + phase) + .012 * Math.sin(time * .19 + phase * 1.7));
+  const base = light.strength ?? 1;
+  if (reducedMotion) return base;
+  const t = Number.isFinite(time) ? time : 0;
+  const phase = light.flickerSeed ?? light.x * .013 + light.y * .009;
+  if (light.type !== 'lamp') return base * (1 + .027 * Math.sin(t * .47 + phase) + .012 * Math.sin(t * .19 + phase * 1.7));
+  const rate = 2.8 + noiseHash(phase + 5) * 1.3;
+  return base * (1 + .04 * smoothNoise(phase, t * rate + phase) + .025 * smoothNoise(phase + 41, t * .43 + phase * .7));
 }
 
 /** Keep a flare centered on the actual bulb, with a gentle viewport-edge fade. */
@@ -66,8 +80,8 @@ export const MENU_LAMP_ART = [
   [.5712, .744, .25], [.6945, .7407, .25], [.7488, .7439, .23],
 ];
 export function menuLamps(offset = { x: 0, y: 0 }) {
-  return MENU_LAMP_ART.map(([u, v, strength]) => ({
+  return MENU_LAMP_ART.map(([u, v, strength], index) => ({
     x: -5 + offset.x * 2 + u * 1290, y: -4 + offset.y * 2 + v * 728,
-    type: 'lamp', kind: 'amber', strength,
+    type: 'lamp', kind: 'amber', strength, flickerSeed: index * 13.73 + .41,
   }));
 }

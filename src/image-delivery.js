@@ -34,6 +34,17 @@ export const IMAGE_DELIVERY = Object.freeze([
     "rgbaSHA256": "a1b3288b4edb40df9019bb594e4373c2772ebefc3a29c160b3c617f0e89b3ff0"
   },
   {
+    "source": "assets/cameo-ticket.png",
+    "optimized": "assets/optimized/cameo-ticket.85ba7779f21c.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1390728,
+    "optimizedBytes": 1035556,
+    "sourceSHA256": "8da9c67cddf93df45fbe9e2b7cb14bc9c1e9003d1acd17a9f59f3c5339a0024f",
+    "optimizedSHA256": "85ba7779f21cbd5491e11f577e54c66a29bde7bae26ffdfeafaca806f6c9e252",
+    "rgbaSHA256": "e3c5cafb29fe53959f14c4536f159c470978e31d040c55ead8f71dbefb028ca9"
+  },
+  {
     "source": "assets/celebration.png",
     "optimized": "assets/optimized/celebration.ae9a29472ba3.webp",
     "width": 1254,
@@ -265,6 +276,226 @@ export const IMAGE_DELIVERY = Object.freeze([
     "rgbaSHA256": "41a4a9c6be1931714115ac9e1f4e5899031990806942098093fd61266aefa1d7"
   },
   {
+    "source": "assets/enemies-local-afterhour.png",
+    "optimized": "assets/optimized/enemies-local-afterhour.7e5c6a2bdea9.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1885615,
+    "optimizedBytes": 1481788,
+    "sourceSHA256": "2a3f2f711b19fc66922a1b8e8735007c559921b324d74b75236f912a7f23a2a0",
+    "optimizedSHA256": "7e5c6a2bdea98fdf695383a5785d8ac123d17f83a4368495e718a41de963c054",
+    "rgbaSHA256": "5052c25add257911131bcf6c9c14a7ebed19dc8c9227fd4deca7e5838bdeaa35"
+  },
+  {
+    "source": "assets/enemies-local-business.png",
+    "optimized": "assets/optimized/enemies-local-business.6b2406045e50.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1791836,
+    "optimizedBytes": 1353912,
+    "sourceSHA256": "88d8bd47cb12de7b88127aee62380444e7351c31d8bfdfdc540ea4300b1b2e60",
+    "optimizedSHA256": "6b2406045e50d337d973abdfbc3fb746cd52e18650fc170c4e4b503e537cd2c1",
+    "rgbaSHA256": "64e0525eda6286b54db2c06d859e130c7efe3049545fa85234b9e684701afb90"
+  },
+  {
+    "source": "assets/enemies-local-complaint.png",
+    "optimized": "assets/optimized/enemies-local-complaint.a27c9a3b83ee.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1843953,
+    "optimizedBytes": 1415944,
+    "sourceSHA256": "8afc2e3a237dcc767a3c56ffe83624369bdf380491eb967bb42a1a2fa55ff826",
+    "optimizedSHA256": "a27c9a3b83ee52fe35f4e2fcd011aad49ce400d416d1231ef4b3c1f95da19e60",
+    "rgbaSHA256": "04a19e2aa034fd84cc6f24abd9eabf75654ac8e53d67853c186f0b917fe2da36"
+  },
+  {
+    "source": "assets/enemies-local-concrete.png",
+    "optimized": "assets/optimized/enemies-local-concrete.cda4dc0d8072.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1822959,
+    "optimizedBytes": 1420442,
+    "sourceSHA256": "2ab048091e93b053c566bdf4a43f67c5d685128ff9dd8a9a646bdbe4964fe50e",
+    "optimizedSHA256": "cda4dc0d8072b3256696c5813137b30a55f20688813a607509a280c7fd58e5b2",
+    "rgbaSHA256": "efd28652709b1b2a3be683160bf79bad9531d2edb681cb2bde55eec3b59ff9d7"
+  },
+  {
+    "source": "assets/enemies-local-eco_guard.png",
+    "optimized": "assets/optimized/enemies-local-eco_guard.f400babaed78.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1724813,
+    "optimizedBytes": 1350958,
+    "sourceSHA256": "587f4448ffb4d1ea94c3109e9b018bbc0bbe40bb2b5558da8044d5967cfb8642",
+    "optimizedSHA256": "f400babaed78332b9daed0c57d7989d78309320391f222725ca52490040dd17f",
+    "rgbaSHA256": "1a95ae76a89a71455f4e74f4f321603c1c5a7126b0e2cd068e7d6e32b9ebfc38"
+  },
+  {
+    "source": "assets/enemies-local-festival.png",
+    "optimized": "assets/optimized/enemies-local-festival.aec433e173e1.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1775478,
+    "optimizedBytes": 1407842,
+    "sourceSHA256": "64a6df0dd56f8e1bbe05ef7b7ebd4a44137f7b0129409a2d72fb97e773448693",
+    "optimizedSHA256": "aec433e173e1e668618ea8bdd3c90ca1a1681a004cbb6a87537836cb04789ef8",
+    "rgbaSHA256": "baf14125741bcc91559f4ce904dc4b271c38bd8e77468891152801c4025290f0"
+  },
+  {
+    "source": "assets/enemies-local-finance.png",
+    "optimized": "assets/optimized/enemies-local-finance.82e1f9044ad4.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1712666,
+    "optimizedBytes": 1330700,
+    "sourceSHA256": "d840df990c4b20c8f03740c74234a8931c808532c6891f7b95a114827ffe6ecc",
+    "optimizedSHA256": "82e1f9044ad45c0b9af7bf9dd59f8809ddfaded9b4ba9ad3403379c5dce4524b",
+    "rgbaSHA256": "86d4cfeda54727c4a168879ab0bbc185d3ed3df205970a05d99b5c548347e43b"
+  },
+  {
+    "source": "assets/enemies-local-frust.png",
+    "optimized": "assets/optimized/enemies-local-frust.fd96da235f41.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1904077,
+    "optimizedBytes": 1461634,
+    "sourceSHA256": "97267baa4cbb6e75234f2243d0b6ba54fba8a60c35a225e7e9f025b67cb0f9da",
+    "optimizedSHA256": "fd96da235f41aec404c464f751d9440ffe27d910a12299f01f34a23372516c68",
+    "rgbaSHA256": "4f0831a92ec3a645d8202932e4cf66c8b1ec0a368296b33122f6e8e4790d8b20"
+  },
+  {
+    "source": "assets/enemies-local-grill.png",
+    "optimized": "assets/optimized/enemies-local-grill.fbf6f55b5390.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1826940,
+    "optimizedBytes": 1455996,
+    "sourceSHA256": "a9e8a84ca5f44b66af1f81e1bf3e27b528b2fc2cc8c775793a49dfe186c0b434",
+    "optimizedSHA256": "fbf6f55b5390674fce85fad7835504596f5030a7539ecb5249bdc208d5479660",
+    "rgbaSHA256": "3fc35e7d94b9f8d51bfa19b9aab9a18f1d3fdd52c6269f8223f77dbe652abb60"
+  },
+  {
+    "source": "assets/enemies-local-helmet.png",
+    "optimized": "assets/optimized/enemies-local-helmet.1d9540b6a385.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1658178,
+    "optimizedBytes": 1309510,
+    "sourceSHA256": "c6c5161c9a3803e154e0fbab1616fb544834f8ff6336d9a4802d4dd74980c5b4",
+    "optimizedSHA256": "1d9540b6a38547d84778f7652629b4be755f4f2294f5aca37e36dca7f4af805a",
+    "rgbaSHA256": "2ac117b7de6e907e455b57821bc690371e47f525c4177e83b3fbebbc1cc50233"
+  },
+  {
+    "source": "assets/enemies-local-hustle.png",
+    "optimized": "assets/optimized/enemies-local-hustle.92c6d603a6ca.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1722888,
+    "optimizedBytes": 1346366,
+    "sourceSHA256": "fd7c4935f1862332c97ef9a2ace02b4d0efad264ebf000c8600ea62906a806b1",
+    "optimizedSHA256": "92c6d603a6cacbfd78feb328cb45acf3b713d4c5b379f35b2d5fd15f29c7678d",
+    "rgbaSHA256": "ca1544bf05fa0b0ade6a8f45723037927b8334b0d086d6b6ed03704d9bf6bcf7"
+  },
+  {
+    "source": "assets/enemies-local-luxury.png",
+    "optimized": "assets/optimized/enemies-local-luxury.9ecdbc3d2e9a.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1813681,
+    "optimizedBytes": 1408142,
+    "sourceSHA256": "212d2e2e401265c9d15c27c6723cd2cdd828ce04b6a762d6261c6c3e5fcc1e86",
+    "optimizedSHA256": "9ecdbc3d2e9a9e57ec509a2c17786e06e396c9ed50bbbad16b97cf8e6663df76",
+    "rgbaSHA256": "04d8fb0a5cfc914bfe9d2d208e0e33f203dba17ab6de4fc8e3917eaeca3e279d"
+  },
+  {
+    "source": "assets/enemies-local-parking.png",
+    "optimized": "assets/optimized/enemies-local-parking.d5f210149688.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1738176,
+    "optimizedBytes": 1380180,
+    "sourceSHA256": "b59d1448fa0bbe78d4353a903a77f411d7d0e76b4c799a45fe3c855df6055a8b",
+    "optimizedSHA256": "d5f210149688766c7d356db336e261bf21eedc040ca5495a928321327390c6b4",
+    "rgbaSHA256": "ead96fa971be5576021ef7739e1a8fa0af288d4e5d8a98798e8bb98128cd801e"
+  },
+  {
+    "source": "assets/enemies-local-puffer.png",
+    "optimized": "assets/optimized/enemies-local-puffer.26ee04f3489e.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1672658,
+    "optimizedBytes": 1270934,
+    "sourceSHA256": "81185564887932c88e719ae0aafd832a9e818d91a35a54a23003b6e7ebff13b3",
+    "optimizedSHA256": "26ee04f3489e83e198ca9e2b70d8509fa18dbde3197b1d451b594aa035ed400a",
+    "rgbaSHA256": "e3ef6ed235790059e76454a3a22841c4359c39a130da50351711d620a12fe4ed"
+  },
+  {
+    "source": "assets/enemies-local-queue.png",
+    "optimized": "assets/optimized/enemies-local-queue.246917423490.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1700723,
+    "optimizedBytes": 1353766,
+    "sourceSHA256": "42aa212445ff53b99b6819c7ea5a1c4e86cadfb51d8196883eb3432f2e2e2cfd",
+    "optimizedSHA256": "246917423490c1fe7ffb9d0427ea60cfca6ca508ee580386f12eba154a55e17a",
+    "rgbaSHA256": "2b25a81fef80b1e2ef359b311a5d831c86b6c5a82dc2fd6ac75e324f5625ff0d"
+  },
+  {
+    "source": "assets/enemies-local-selfie.png",
+    "optimized": "assets/optimized/enemies-local-selfie.22e5bda48dc9.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1938821,
+    "optimizedBytes": 1484788,
+    "sourceSHA256": "5ebc40fcd150498a9dc1a46021005d8281d258f4998c2c62603a711f1928f8b4",
+    "optimizedSHA256": "22e5bda48dc992c148647c4a472c0a8bf839dd025997a5c6186d91416ed7f098",
+    "rgbaSHA256": "421fa7fe2bcedda67bf1025423eb8e6c9b0a0aadfefd92dca935c680d973cc8b"
+  },
+  {
+    "source": "assets/enemies-local-shift.png",
+    "optimized": "assets/optimized/enemies-local-shift.412372df7eec.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1821276,
+    "optimizedBytes": 1440730,
+    "sourceSHA256": "f2e9926c42d089f02dfa94e8b4ec378dc7f11f587ebd3dde972cb1056273a495",
+    "optimizedSHA256": "412372df7eec8e54ae417c8fca7a24714e04a90d4312763f86601df3f80dcaa2",
+    "rgbaSHA256": "d8411213b330ed0f031d9ce675104a07d7e9d663f4e66a781c4051d6aa7c90ef"
+  },
+  {
+    "source": "assets/enemies-local-student.png",
+    "optimized": "assets/optimized/enemies-local-student.7d3fa2681574.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1748655,
+    "optimizedBytes": 1372364,
+    "sourceSHA256": "a88e6ff976c7b954fcf69c6bfceb8a0b7251dc83ed53f1170cfe8f6af6efbaa2",
+    "optimizedSHA256": "7d3fa268157431941f57eb66f167ac43b5b5096cf1260a69288846572a1cef83",
+    "rgbaSHA256": "269384add3818f97a7d4796b47fa47794fc9052dbcfd929a63706f1b54fd8782"
+  },
+  {
+    "source": "assets/enemies-local-tunnel.png",
+    "optimized": "assets/optimized/enemies-local-tunnel.5016057a4026.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1697547,
+    "optimizedBytes": 1309710,
+    "sourceSHA256": "4ad8dd999ade16f9a5f650758432ffddff1cac40c68b88798933e0cd5d9201e5",
+    "optimizedSHA256": "5016057a402643d4626428ccff81d8182d7927aeb88f1aed7ec95947a78c0890",
+    "rgbaSHA256": "4d699592a7470786eb6317e0414401c27346673fa86aa947b03ab763630f4e5a"
+  },
+  {
+    "source": "assets/enemies-local-ultra.png",
+    "optimized": "assets/optimized/enemies-local-ultra.74a0f38bc600.webp",
+    "width": 1254,
+    "height": 1254,
+    "sourceBytes": 1669396,
+    "optimizedBytes": 1324298,
+    "sourceSHA256": "caa71a51830c18df4fea624e38e68954d3ff291e251411dfc7dc08e99aba4d7e",
+    "optimizedSHA256": "74a0f38bc60057ea91139b231e0d8c7a045f76eef144b96dbd4ef40d5a9dd5d0",
+    "rgbaSHA256": "821bcf88fcf3a079738557f3c29272586d8ba7b9722aef1b97a61fc639ba2d5e"
+  },
+  {
     "source": "assets/enemies-night-a.png",
     "optimized": "assets/optimized/enemies-night-a.3ae462604011.webp",
     "width": 1254,
@@ -417,6 +648,17 @@ export const IMAGE_DELIVERY = Object.freeze([
     "sourceSHA256": "aa010b5e7c297d81992edab6a796194918946ca6e3e3957c4b01c906576df485",
     "optimizedSHA256": "72cc289026e10308507a981d3333850778f52ae6774edc3253fd4def40e2e71a",
     "rgbaSHA256": "4edf900bb862361b06eac15671d8f98347e8e785350f91d6188dafe7c0679ef2"
+  },
+  {
+    "source": "assets/nightlife-cameos.png",
+    "optimized": "assets/optimized/nightlife-cameos.7b9526e8463e.webp",
+    "width": 1774,
+    "height": 887,
+    "sourceBytes": 2003365,
+    "optimizedBytes": 1565216,
+    "sourceSHA256": "cc8861e3a85a3b1c5b5d4957ccbcd404ef9e31c35fe63d78a8feba6d6dc41ef2",
+    "optimizedSHA256": "7b9526e8463e7b78a5a1ff22aad619fd7d74918aa7f6bcfdc225abe1bc25fc07",
+    "rgbaSHA256": "3a46cd9fba4f31b6f66ab5657d8fecacdc97aca25fccc54eada15bb46de091cc"
   },
   {
     "source": "assets/props.png",
@@ -582,6 +824,17 @@ export const IMAGE_DELIVERY = Object.freeze([
     "sourceSHA256": "50a000fe59c2d41e47838ccb11360d710ed2fd3d41a9e1e52fc08746eb72ae71",
     "optimizedSHA256": "4fcdc338fd4d3eea9321598549dbace81b97281ded9c4c6f57ec12a9eb71d48e",
     "rgbaSHA256": "c3e733dafa602d734bb66fb8d646bb6bf49df2aa991e42db0d2dac57e2c23923"
+  },
+  {
+    "source": "assets/worlds/dreisam-panels.png",
+    "optimized": "assets/optimized/worlds/dreisam-panels.c1503cbdeaf8.webp",
+    "width": 1183,
+    "height": 1330,
+    "sourceBytes": 2867919,
+    "optimizedBytes": 2395566,
+    "sourceSHA256": "af2839f15b96d964a5f13c033a140c4f944757e80078f3f972aa326c0fd1553b",
+    "optimizedSHA256": "c1503cbdeaf8c83f46f8b0f05672b72cb9837a8dfcfaed70c7dc753444a00ef6",
+    "rgbaSHA256": "c5499f9c9268fe9f5c61958c6e91a494ed6efdb68202256159cd577457e53bb3"
   },
   {
     "source": "assets/worlds/haslach-0.png",

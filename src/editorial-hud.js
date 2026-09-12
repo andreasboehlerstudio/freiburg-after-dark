@@ -46,7 +46,9 @@ export function drawEditorialHud(renderer) {
   renderer.healthTrail ||= new Map();
 
   heroes.forEach((hero, index) => {
-    const partner = index > 0, baseline = partner ? 106 : 49;
+    const coop = g.cooperative, partner = !coop && index > 0;
+    const x = coop ? 40 + index * 240 : 40, width = coop ? 210 : 258;
+    const baseline = partner ? 106 : 49;
     const y = partner ? 115 : 60, height = partner ? 3 : 5;
     const ratio = clamp(hero.hp / (hero.maxHp || 100));
     const key = hero.uid ?? `hero-${index}`;
@@ -54,12 +56,14 @@ export function drawEditorialHud(renderer) {
     trail.value = ratio >= trail.value ? ratio : Math.max(ratio, trail.value - Math.max(0, renderer.time - trail.time) * .42);
     trail.time = renderer.time;
     renderer.healthTrail.set(key, trail);
-    text(c, hero.name || renderer.heroId(hero), 40, baseline, partner ? 16 : 25, partner ? '#d5cfd0' : WHITE, 'left', true, 235);
-    text(c, partner ? 'KI' : '1P', 298, baseline - 1, partner ? 8 : 9, partner ? GRAY : RED, 'right', false);
-    health(c, 40, y, 258, ratio, height, trail.value);
-    line(c, 40, y + height + 7, 258 * clamp(hero.energy / (hero.maxEnergy || 100)), '#d4c7bf8f');
+    text(c, hero.name || renderer.heroId(hero), x, baseline, partner ? 16 : coop ? 21 : 25, partner ? '#d5cfd0' : WHITE, 'left', true, width - 28);
+    text(c, partner ? 'KI' : `${index + 1}P`, x + width, baseline - 1, partner ? 8 : 9, partner ? GRAY : RED, 'right', false);
+    health(c, x, y, width, ratio, height, trail.value);
+    line(c, x, y + height + 7, width * clamp(hero.energy / (hero.maxEnergy || 100)), '#d4c7bf8f');
+    if (coop) text(c, hero.hp <= 0 ? 'AM BODEN · HILFE' : hero.heldItem ? 'GEGENSTAND BEREIT' : 'ENERGIE', x, 87, 8, hero.hp <= 0 ? RED : GRAY, 'left', false, width);
   });
-  line(c, 40, 146, 258);
+  if (g.cooperative) text(c, `${g.rescues || 0} TEAM-RESERVEN`, 40, 110, 9, GRAY, 'left', false);
+  else line(c, 40, 146, 258);
 
   text(c, points.format(g.score ?? g.state?.score ?? 0), 1238, 50, 29, WHITE, 'right', true, 230);
   text(c, 'PUNKTE', 1238, 68, 9, GRAY, 'right', false);
@@ -67,7 +71,7 @@ export function drawEditorialHud(renderer) {
   const level = g.level || LEVELS[renderer.levelIndex()];
   const wave = g.wave ?? g.state?.wave ?? 1;
   const waves = level?.waves?.[g.arena?.index ?? 0]?.length;
-  text(c, level?.name || 'FREIBURG', 42, 668, 14, WHITE, 'left', true, 335);
+  text(c, `LEVEL ${renderer.levelIndex() + 1} / ${LEVELS.length} · ${level?.name || 'FREIBURG'}`, 42, 668, 14, WHITE, 'left', true, 355);
   text(c, g.arena?.cleared ? 'WEG FREI' : `WELLE ${wave}${waves ? ' / ' + waves : ''}`, 42, 686, 9, GRAY, 'left', false);
 
   const combo = g.combo ?? g.state?.combo ?? 0;
@@ -89,8 +93,8 @@ export function drawEditorialHud(renderer) {
   if (g.announcement && g.announcementTime > 0) {
     c.save();
     c.globalAlpha = clamp(g.announcementTime * 2);
-    text(c, String(g.announcement).replace(/^\d+\s*·\s*/, ''), 640, 48, 19, WHITE, 'center', true, 450);
-    line(c, 625, 61, 30, RED, 2);
+    text(c, String(g.announcement).replace(/^\d+\s*·\s*/, ''), 640, g.cooperative ? 127 : 48, 19, WHITE, 'center', true, 450);
+    line(c, 625, g.cooperative ? 140 : 61, 30, RED, 2);
     c.restore();
   }
 
@@ -102,11 +106,11 @@ export function drawEditorialHud(renderer) {
   }
 
   if (g.mode === 'playing') {
-    const down = heroes.find(hero => hero.hp <= 0);
+    const down = heroes.filter(hero => hero.hp <= 0).sort((a, b) => (b.rescueProgress || 0) - (a.rescueProgress || 0))[0];
     const live = heroes.find(hero => hero.hp > 0);
-    if (down && live && (down.isPartner || g.rescues > 0)) {
-      text(c, down.isPartner ? 'BEIM PARTNER E HALTEN · WIEDERBELEBEN' : 'DEIN PARTNER KOMMT ZUR HILFE', 640, 610, 12, WHITE, 'center', true, 450);
-      health(c, 490, 620, 300, down.rescueProgress / (down.isPartner ? 12 : 2.8), 2);
+    if (down && live && (g.cooperative || down.isPartner || g.rescues > 0)) {
+      text(c, g.cooperative ? `${down.playerIndex + 1}P AM BODEN · E / LB HALTEN ZUM WIEDERBELEBEN` : down.isPartner ? 'BEIM PARTNER E HALTEN · WIEDERBELEBEN' : 'DEIN PARTNER KOMMT ZUR HILFE', 640, 610, 12, WHITE, 'center', true, 500);
+      health(c, 490, 620, 300, down.rescueProgress / (g.cooperative ? 2.4 : down.isPartner ? 12 : 2.8), 2);
     } else if (!down) {
       const hint = propHint(renderer);
       if (hint) {
