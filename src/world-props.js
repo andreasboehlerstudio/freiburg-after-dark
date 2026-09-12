@@ -115,5 +115,8 @@ export function propHint(renderer) {
   const nearby = item || nearbyProp(player);
   if (!nearby) return;
   const text = item ? (item.type === 'bat' ? 'J SCHLAGEN · E WERFEN' : 'E / J FAHRRAD WERFEN') : `E ${nearby.type === 'bat' ? 'BASEBALLSCHLÄGER' : 'FAHRRAD'} AUFHEBEN`;
-  return cooperative ? `${player.playerIndex + 1}P · ${text.replaceAll('J', 'J / X').replaceAll('E ', 'E / LB ')}` : text;
+  const binding=renderer.inputBindings?.[player.playerIndex];
+  const attack=binding?.kind==='keyboard'?(binding.keyboardIndex===1?'J':'C'):binding?.kind==='gamepad'?'X':'J / X';
+  const interact=binding?.kind==='keyboard'?(binding.keyboardIndex===1?'O':'E'):binding?.kind==='gamepad'?'LB':'E / LB';
+  return cooperative ? `${player.playerIndex + 1}P · ${text.replaceAll('J', attack).replaceAll('E ', interact+' ')}` : text;
 }

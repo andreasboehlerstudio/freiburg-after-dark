@@ -109,7 +109,7 @@ export function drawEditorialHud(renderer) {
     const down = heroes.filter(hero => hero.hp <= 0).sort((a, b) => (b.rescueProgress || 0) - (a.rescueProgress || 0))[0];
     const live = heroes.find(hero => hero.hp > 0);
     if (down && live && (g.cooperative || down.isPartner || g.rescues > 0)) {
-      text(c, g.cooperative ? `${down.playerIndex + 1}P AM BODEN · E / LB HALTEN ZUM WIEDERBELEBEN` : down.isPartner ? 'BEIM PARTNER E HALTEN · WIEDERBELEBEN' : 'DEIN PARTNER KOMMT ZUR HILFE', 640, 610, 12, WHITE, 'center', true, 500);
+      text(c, g.cooperative ? `${down.playerIndex + 1}P AM BODEN · E / O / LB HALTEN ZUM WIEDERBELEBEN` : down.isPartner ? 'BEIM PARTNER E HALTEN · WIEDERBELEBEN' : 'DEIN PARTNER KOMMT ZUR HILFE', 640, 610, 12, WHITE, 'center', true, 500);
       health(c, 490, 620, 300, down.rescueProgress / (g.cooperative ? 2.4 : down.isPartner ? 12 : 2.8), 2);
     } else if (!down) {
       const hint = propHint(renderer);

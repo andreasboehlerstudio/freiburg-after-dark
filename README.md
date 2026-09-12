@@ -1,8 +1,8 @@
 # Freiburg After Dark
 
-Version 1.9.0 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
+Version 1.9.1 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
 
-Im Browser öffnen und „Spiel starten“ wählen. Solo: Hauptfigur und Sidekick auswählen. Couch-Koop: zwei bis vier Gamepads mit A anmelden, Spieler 1 kann die Tastatur nutzen. Danach erklärt ein Steuerungsbildschirm die wichtigsten Aktionen und führt zur Levelroute. Auf dem Startbildschirm läuft Musik als Loop; falls der Browser zunächst stumm bleibt, „Musik aktivieren“ anklicken. Beim Spielstart wird zur Levelmusik überblendet. In den Einstellungen lassen sich Musik, Effekte und Kampflaute getrennt regeln.
+Im Browser öffnen und „Spiel starten“ wählen. Solo: Hauptfigur und Sidekick auswählen. Couch-Koop: „Tastatur links“ und „Tastatur rechts“ auswählen, um zu zweit ohne Controller zu spielen. Weitere Spieler können per Gamepad mit A beitreten; insgesamt bis zu vier. Danach erklärt ein Steuerungsbildschirm die wichtigsten Aktionen und führt zur Levelroute. Auf dem Startbildschirm läuft Musik als Loop; falls der Browser zunächst stumm bleibt, „Musik aktivieren“ anklicken. Beim Spielstart wird zur Levelmusik überblendet. In den Einstellungen lassen sich Musik, Effekte und Kampflaute getrennt regeln.
 
 Für einen schnelleren Start lädt zunächst nur das Hauptmenü. Charakterauswahl und Viertel folgen bei Bedarf, mit sichtbarem Ladefortschritt und einer Schaltfläche zum erneuten Versuch bei Verbindungsproblemen. Verlustfreie WebP-Dateien reduzieren die Bildübertragung; die Originalgrafiken bleiben als Ausweichformat erhalten.
 
@@ -22,6 +22,18 @@ Für einen schnelleren Start lädt zunächst nur das Hauptmenü. Charakterauswah
 | Pause | Esc | Start |
 | Vollbild | F | Bildschirm-Schaltfläche |
 
+## Zwei an einer Tastatur
+
+| Aktion | Tastatur links | Tastatur rechts |
+|---|---|---|
+| Bewegen | WASD | Pfeiltasten |
+| Schlag / Tritt / Spezial | C / V / X | J / K / L |
+| Springen | Leertaste | Enter |
+| Ausweichen | Linke Shift | Rechte Shift |
+| Aufheben / Werfen / Aufhelfen | E | O |
+
+Zum Aufhelfen die Interaktionstaste halten. Esc pausiert für beide. Die Tastaturseiten bleiben beim Figurenwechsel, Neustart und Levelwechsel zugeordnet. Im Solo bleibt die bisherige Belegung bestehen.
+
 Ein Baseballschläger hält sechs erfolgreiche Schläge; J wirft ein getragenes Fahrrad. E wirft beide Gegenstandsarten. In der Nähe eines gestürzten Partners hat das Aufhelfen Vorrang.
 
 ## Die Nacht
@@ -36,7 +48,7 @@ Gegner laufen zeitversetzt von außerhalb des Bildes ein. Sitzende Protestfigure
 
 Schmale anamorphische Lichtstreifen sitzen direkt auf den Straßenlampen und flackern unabhängig, sanft und unregelmäßig. Langsamer Dunst und vereinzelte Blätter an Baumreihen beleben den Hintergrund. Bei reduzierter Bewegung bleibt die Beleuchtung ruhig. Die Dreisam besitzt eine eigene gezeichnete Uferszene, blaue Brückenbeleuchtung und einen eigenen Hip-Hop-Track.
 
-Im Couch-Koop werden mehr Gegner und stärkere Bosse auf das Team abgestimmt. E / LB halten hilft einem gestürzten Teammitglied auf; nach zwölf Sekunden kostet die automatische Rückkehr eine gemeinsame Reserve. Sind alle am Boden, ist die Runde verloren. Ein getrennter Controller pausiert das Spiel bis zum erneuten Verbinden oder bewussten Zuweisen eines Ersatzcontrollers.
+Im Couch-Koop werden mehr Gegner und stärkere Bosse auf das Team abgestimmt. E / O / LB halten hilft einem gestürzten Teammitglied auf; nach zwölf Sekunden kostet die automatische Rückkehr eine gemeinsame Reserve. Sind alle am Boden, ist die Runde verloren. Ein getrennter Controller pausiert das Spiel bis zum erneuten Verbinden oder bewussten Zuweisen eines Ersatzcontrollers.
 
 Das Spiel und seine Gegnerrollen sind fiktional. Die Freiburger Schauplätze sind als Arcade-Kulissen interpretiert. Fortschritt und Einstellungen bleiben im Browser auf diesem Gerät. Desktop-Steuerung; der KI-Sidekick gehört zum Solomodus.
 

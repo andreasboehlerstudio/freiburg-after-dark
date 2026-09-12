@@ -28,7 +28,7 @@ export function drawNightlifeCameos(renderer){
   if(nearby.has(cameo)||thanked){
    const labelY=Math.max(68,y-height-26);
    c.font='12px "Freiburg Display",Impact,sans-serif';c.textAlign='center';c.textBaseline='middle';
-   const name=String(cameo.name||cameo.id).toUpperCase(),prompt=thanked?'DANKE!':`E / LB · ${cameo.actionLabel||'BEGRÜSSEN'}`.toUpperCase();
+   const name=String(cameo.name||cameo.id).toUpperCase(),prompt=thanked?'DANKE!':`${game.cooperative?'E / O / LB':'E / LB'} · ${cameo.actionLabel||'BEGRÜSSEN'}`.toUpperCase();
    const boxWidth=Math.min(280,Math.max(130,c.measureText?.(prompt)?.width+28||180,c.measureText?.(name)?.width+28||180));
    const labelX=Math.max(boxWidth/2+8,Math.min(1272-boxWidth/2,x));
    c.fillStyle='#070a10cf';c.fillRect(labelX-boxWidth/2,labelY-13,boxWidth,42);

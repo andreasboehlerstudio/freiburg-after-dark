@@ -1,3 +1,4 @@
+import {coopKeyboardHelp} from './local-coop-input.js';
 import { clipSpriteFrame } from './combat-animation.js';
 
 const MOVES = [
@@ -12,12 +13,14 @@ export class StartTutorial {
     this.canvas = canvas; this.renderer = renderer; this.menuScene = menuScene;
     this.active = false; this.dirty = true;
   }
-  html() {
-    return `<section class="start-tutorial" aria-labelledby="tutorial-title">
+  html({cooperative=false,bindings=[]}={}) {
+    const help=cooperative?coopKeyboardHelp(bindings):'';
+    return `<section class="start-tutorial ${help?'has-keyboard-guide':''}" aria-labelledby="tutorial-title">
       <header class="tutorial-header"><canvas class="tutorial-logo" role="img" aria-label="Freiburg After Dark"></canvas><div><p class="tutorial-eyebrow">BEVOR DIE NACHT BEGINNT</p><h1 id="tutorial-title">DEIN ERSTER SCHLAG.</h1><p class="tutorial-subtitle">Drei Moves. Dann gehört dir die Straße.</p></div></header>
-      <div class="tutorial-moves">${MOVES.map(([number, title, keys, pad], i) => `<article class="tutorial-move"><div class="tutorial-move-title"><span>${number}</span><h2>${title}</h2></div><div class="tutorial-key-row">${keys}<small>${pad}</small></div><canvas data-tutorial-pose="${i}" role="img" aria-label="${title.toLowerCase()}: dein gewählter Kämpfer"></canvas></article>`).join('')}</div>
-      <div class="tutorial-extras">${[['SPRINGEN','LEERTASTE','A'],['AUSWEICHEN','SHIFT','B'],['SPEZIAL','L','RB · 45 ENERGIE'],['AUFHEBEN / WERFEN','E','LB']].map(([title,key,pad])=>`<div><h3>${title}</h3><p><kbd>${key}</kbd><span>/ ${pad}</span></p></div>`).join('')}</div>
-      <footer class="tutorial-footer"><div><p class="tutorial-tip">SPRUNGTRITT: IN DER LUFT J ODER K.</p><p class="tutorial-team">DEIN SIDEKICK KÄMPFT AUTOMATISCH.</p><p class="tutorial-utilities"><button data-action="tutorial-back">← Zurück <span>ESC</span></button><span>IM SPIEL: ESC PAUSE · F VOLLBILD</span></p></div><button class="tutorial-start" data-action="tutorial-start">VERSTANDEN. LOS GEHT’S.<kbd>ENTER / A</kbd></button></footer>
+      <div class="tutorial-moves">${MOVES.map(([number, title, keys, pad], i) => `<article class="tutorial-move"><div class="tutorial-move-title"><span>${number}</span><h2>${title}</h2></div><div class="tutorial-key-row">${cooperative?i===0?'<kbd>WASD / PFEILE</kbd>':i===1?'<kbd>C / J</kbd>':'<kbd>V / K</kbd>':keys}<small>${pad}</small></div><canvas data-tutorial-pose="${i}" role="img" aria-label="${title.toLowerCase()}: dein gewählter Kämpfer"></canvas></article>`).join('')}</div>
+      <div class="tutorial-extras">${(cooperative?[['SPRINGEN','LEER / ENTER','A'],['AUSWEICHEN','SHIFT LINKS / RECHTS','B'],['SPEZIAL','X / L','RB · 45 ENERGIE'],['AUFHEBEN / WERFEN','E / O','LB']]:[['SPRINGEN','LEERTASTE','A'],['AUSWEICHEN','SHIFT','B'],['SPEZIAL','L','RB · 45 ENERGIE'],['AUFHEBEN / WERFEN','E','LB']]).map(([title,key,pad])=>`<div><h3>${title}</h3><p><kbd>${key}</kbd><span>/ ${pad}</span></p></div>`).join('')}</div>
+      ${help}
+      <footer class="tutorial-footer"><div><p class="tutorial-tip">SPRUNGTRITT: IN DER LUFT ${cooperative?'C / V ODER J / K':'J ODER K'}.</p><p class="tutorial-team">DEIN SIDEKICK KÄMPFT AUTOMATISCH.</p><p class="tutorial-utilities"><button data-action="tutorial-back">← Zurück <span>ESC</span></button><span>IM SPIEL: ESC PAUSE · F VOLLBILD</span></p></div><button class="tutorial-start" data-action="tutorial-start">VERSTANDEN. LOS GEHT’S.<kbd>ENTER / A</kbd></button></footer>
     </section>`;
   }
   begin(heroId, { cooperative = false, humanCount = 1 } = {}) {
@@ -26,7 +29,7 @@ export class StartTutorial {
     if (!this.root) return;
     this.menuScene.drawLogo(this.root.querySelector('.tutorial-logo'));
     this.root.querySelector('.tutorial-team').textContent = cooperative
-      ? `${humanCount} SPIELER · ZUSAMMENBLEIBEN · E / LB ZUM WIEDERBELEBEN HALTEN.`
+      ? `${humanCount} SPIELER · ZUSAMMENBLEIBEN · E / O / LB ZUM WIEDERBELEBEN HALTEN.`
       : 'DEIN SIDEKICK KÄMPFT AUTOMATISCH.';
     this.root.querySelector('[data-action="tutorial-start"]')?.focus({ preventScroll: true });
     this.drawPoses(); this.render(0);
