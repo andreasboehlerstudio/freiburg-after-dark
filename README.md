@@ -1,6 +1,6 @@
 # Freiburg After Dark
 
-Version 1.10.1 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
+Version 1.10.2 — ein gezeichnetes 2D-Beat-’em-up durch das nächtliche Freiburg: solo mit KI-Sidekick oder lokal mit zwei bis vier Menschen.
 
 Im Browser öffnen und „Spiel starten“ wählen. Solo: Hauptfigur und Sidekick auswählen. Couch-Koop: „Tastatur links“ und „Tastatur rechts“ auswählen, um zu zweit ohne Controller zu spielen. Weitere Spieler können per Gamepad mit A beitreten; insgesamt bis zu vier. Danach erklärt ein Steuerungsbildschirm die wichtigsten Aktionen und führt zur Levelroute. Auf dem Startbildschirm läuft Musik als Loop; falls der Browser zunächst stumm bleibt, „Musik aktivieren“ anklicken. Beim Spielstart wird zur Levelmusik überblendet. In den Einstellungen lassen sich Musik, Effekte und Kampflaute getrennt regeln.
 
@@ -38,7 +38,7 @@ Ein Baseballschläger hält sechs erfolgreiche Schläge; J wirft ein getragenes 
 
 ## Die letzte Runde
 
-Nico, Stefan, Torsten und Andreas Böhler geraten durch eine vertauschte Tasche und einen verschwundenen Freund an den selbst ernannten Nachtbürgermeister. Alle vier Helden sind in den sechs Storybildern dabei; Andreas sichert die Hinweise und veröffentlicht am Ende die Abrechnung. Sechs gezeichnete Storybilder begleiten kurze Dialoge vor den Levelrouten und einen Epilog nach dem Finale. Enter / A blättert weiter; Überspringen / Esc führt direkt zur Route beziehungsweise zur Endauswertung. Die Bilder werden erst bei ihrer Szene geladen. Dialoge passen sich dem ausgewählten Team an.
+Nico, Stefan, Torsten und Andreas Böhler geraten durch eine vertauschte Tasche und einen verschwundenen Freund an den selbst ernannten Nachtbürgermeister. Alle vier Helden sind in den sechs Storybildern dabei; Andreas sichert die Hinweise und veröffentlicht am Ende die Abrechnung. Die Story nutzt das gewählte Editorial-Layout: große gestapelte weiße Titel links, rote Akzente, kurze Dialoge und alle vier Helden rechts. Sechs dafür neu komponierte Storybilder begleiten kurze Dialoge vor den Levelrouten und einen Epilog nach dem Finale. Enter / A blättert weiter; Überspringen / Esc führt direkt zur Route beziehungsweise zur Endauswertung. Die Bilder werden erst bei ihrer Szene geladen. Dialoge passen sich dem ausgewählten Team an.
 
 ## Die Nacht
 

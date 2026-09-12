@@ -30,7 +30,23 @@ export function storyEnding(ids){
  return [scene(2,'Vier warme Bier','Die Mähne ist besiegt. Andreas veröffentlicht die gesicherte Abrechnung, und dem selbst ernannten Nachtbürgermeister laufen die Partner davon. Euer Freund öffnet endlich seine eigene Tasche: vier warme Bier. Ein Fahrradschloss.',[['Euer Freund','Hab doch gesagt: Ich habe alles dabei.'],[first,'Können wir jetzt endlich einen trinken?'],[second,'Die machen gerade zu.']], 'ENDE · FREIBURG GEHÖRT WIEDER DER NACHT')];
 }
 
+// Curated line breaks keep chapter titles in the editorial column at every stage size.
+const titleLayouts = {
+ 'Die letzte Runde': [6.75,['Die','letzte','Runde']],
+ 'Eine letzte Nachricht': [4.7,['Eine','letzte','Nachricht']],
+ 'Die falsche Tasche': [5.9,['Die','falsche','Tasche']],
+ 'Alle haben etwas gesehen': [4.6,['Alle haben','etwas','gesehen']],
+ 'Ein ruhiger Treffpunkt': [4.6,['Ein ruhiger','Treffpunkt']],
+ 'Hinter der nächsten Tür': [4.7,['Hinter der','nächsten','Tür']],
+ 'Gerettet. Fast.': [5.4,['Gerettet.','Fast.']],
+ 'Die letzte Tür': [6.75,['Die','letzte','Tür']],
+ 'Vier warme Bier': [5.6,['Vier','warme Bier']]
+};
+
 export function storyHTML(scenes,index=0){
  const s=scenes[index];if(!s)throw new RangeError('Unknown story scene');
- return `<section class="story-screen" aria-labelledby="story-title"><img class="story-image" src="./${esc(s.image)}?v=four-heroes-1" alt="${esc(s.title)} – gezeichnete Szene aus der Freiburger Nacht" decoding="async"><div class="story-shade"></div><header class="story-header"><span>FREIBURG AFTER DARK · DIE LETZTE RUNDE</span><button data-action="story-skip">Überspringen <small>ESC</small></button></header><div class="story-copy"><p class="story-place">${esc(s.place)}</p><h1 id="story-title">${esc(s.title)}</h1><p class="story-body">${esc(s.body)}</p><div class="story-dialogue">${s.lines.map(([who,line])=>`<p><strong>${esc(who)}</strong><span>„${esc(line)}“</span></p>`).join('')}</div><footer><span class="story-count">${String(index+1).padStart(2,'0')} / ${String(scenes.length).padStart(2,'0')}</span><button data-action="story-next">${index+1<scenes.length?'Weiter':s.place.startsWith('ENDE')?'Zur Auswertung':'Zur Levelroute'} <small>ENTER / A</small></button></footer></div></section>`;
+ const [size,titleLines]=titleLayouts[s.title]||[5.5,[s.title]];
+ const next=index+1<scenes.length?'Weiter':s.place.startsWith('ENDE')?'Zur Auswertung':'Zur Levelroute';
+ const place=s.place==='FREIBURG · KURZ VOR MITTERNACHT'?'PROLOG · 23:47 UHR':s.place.startsWith('ENDE')?'EPILOG · DIE NACHT GEHÖRT EUCH':s.place;
+ return `<section class="story-screen" aria-labelledby="story-title"><img class="story-image" src="./${esc(s.image)}?v=editorial-four-heroes-2" alt="${esc(s.title)} – gezeichnete Szene aus der Freiburger Nacht" decoding="async"><div class="story-shade"></div><header class="story-header"><span class="story-brand">FREIBURG <b>AFTER DARK</b></span><button data-action="story-skip">Überspringen <small>ESC</small></button></header><div class="story-copy"><p class="story-place">${esc(place)}</p><h1 id="story-title" style="--story-title-size:${size}cqw" aria-label="${esc(s.title)}">${titleLines.map(line=>`<span class="story-title-line" aria-hidden="true">${esc(line)}</span>`).join('')}</h1><p class="story-body">${esc(s.body)}</p><div class="story-dialogue">${s.lines.map(([who,line])=>`<p><strong>${esc(who)}</strong><span>„${esc(line)}“</span></p>`).join('')}</div></div><footer class="story-footer"><span class="story-count">${String(index+1).padStart(2,'0')} / ${String(scenes.length).padStart(2,'0')}</span><button data-action="story-next">${next} <small>ENTER / A</small><span class="story-next-arrow" aria-hidden="true">→</span></button></footer></section>`;
 }

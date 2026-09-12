@@ -1,19 +1,25 @@
-.story-screen{position:absolute;inset:0;background:#06090f;color:#f5f1eb;overflow:auto;font-family:Arial,sans-serif;isolation:isolate}
+.story-screen{position:absolute;inset:0;background:#080b0e;color:#f5f1eb;overflow:auto;font-family:Arial,sans-serif;isolation:isolate}
 .story-image,.story-shade{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
-.story-image{object-position:center 35%}
-.story-shade{z-index:-1;background:linear-gradient(180deg,#03050ab0 0%,transparent 32%,#03050abf 55%,#03050af5 100%)}
-.story-header{display:flex;justify-content:space-between;align-items:center;padding:2.4cqh 4cqw;gap:2cqw;font-size:1cqw;letter-spacing:.12em}
-.story-header button{background:#080c12b8;border:1px solid #ffffff45;padding:.8cqw 1.2cqw;color:#fff}
-.story-copy{position:relative;padding:0 4cqw 2.5cqh;margin-top:39cqh;max-width:100%}
-.story-place{color:#ff5060;font-size:1cqw;letter-spacing:.15em;text-transform:uppercase;margin:0 0 .6cqh}
-.story-copy h1{font-family:'Freiburg Display',Impact,sans-serif;text-transform:uppercase;font-size:4.6cqw;line-height:1.05;letter-spacing:.015em;margin:0 0 1.2cqh;font-weight:400}
-.story-body{font-size:1.22cqw;line-height:1.5;max-width:73cqw;margin:0 0 1.4cqh;color:#e2e3e6;text-shadow:0 2px 6px #000}
-.story-dialogue{border-left:2px solid #ed1235;padding-left:1.2cqw;max-width:80cqw}
-.story-dialogue p{display:flex;gap:1cqw;margin:.65cqh 0;font-size:1.22cqw;line-height:1.4}
-.story-dialogue strong{color:#ff6570;min-width:8cqw;font-size:1cqw;text-transform:uppercase;letter-spacing:.06em}
-.story-copy footer{display:flex;align-items:center;justify-content:space-between;margin-top:2cqh;padding-top:1.5cqh;border-top:1px solid #ffffff25}
-.story-count{font-size:1cqw;color:#b7bdc5;letter-spacing:.18em}
-.story-copy button{border:0;background:#e5082c;color:white;padding:.85cqw 1.5cqw;font-family:'Freiburg Display',Impact,sans-serif;font-size:1.45cqw;text-transform:uppercase}
-.story-screen button small{font: .8cqw Arial,sans-serif;letter-spacing:.08em;margin-left:1cqw;opacity:.8}
-.story-screen button{cursor:pointer}.story-screen button:focus-visible{outline:2px solid #fff;outline-offset:4px}
-@media(max-aspect-ratio:1/1){.story-copy{margin-top:25cqh}.story-body,.story-dialogue p{font-size:2cqw}.story-header,.story-place,.story-count,.story-dialogue strong{font-size:1.5cqw}.story-body{max-width:none}.story-copy button{font-size:2cqw}}
+.story-image{object-position:center}
+.story-shade{z-index:-1;background:linear-gradient(90deg,#080b0e99 0%,#080b0e65 27%,transparent 37%),linear-gradient(0deg,#03050a75,transparent 17%,transparent 90%,#03050a55)}
+.story-header{position:absolute;top:5cqh;left:2.8cqw;right:2.8cqw;display:flex;justify-content:space-between;align-items:center;gap:2cqw}
+.story-brand{font-family:var(--display);font-size:1.65cqw;letter-spacing:.07em;white-space:nowrap}
+.story-brand b{color:var(--blood);font-weight:400}
+.story-screen button{cursor:pointer;background:transparent;border:0;color:#f5f1eb;text-transform:uppercase;font-family:var(--display);letter-spacing:.12em;padding:.5cqw}
+.story-header button{font-size:.96cqw}
+.story-screen button:hover{color:#ff5360}
+.story-screen button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.story-screen button small{font:.7cqw Arial,sans-serif;letter-spacing:.08em;margin-left:.8cqw;color:#c1c3c7}
+.story-copy{position:relative;margin:16cqh 0 11cqh 2.8cqw;width:26.6cqw}
+.story-place{color:#ff364b;font-family:var(--display);font-size:1.02cqw;line-height:1.45;letter-spacing:.16em;text-transform:uppercase;margin:0 0 1.6cqh}
+.story-copy h1{font-family:var(--display);text-transform:uppercase;font-size:var(--story-title-size,5.5cqw);line-height:1.015;letter-spacing:-.025em;margin:0 0 2.1cqh;padding:0 0 2cqh;border-bottom:2px solid var(--blood);font-weight:400;overflow-wrap:break-word}
+.story-title-line{display:block}
+.story-body{font-size:1.12cqw;line-height:1.45;margin:0 0 2.2cqh;color:#e9e9eb;text-wrap:pretty}
+.story-dialogue p{margin:0 0 1.5cqh;font-size:1.1cqw;line-height:1.4}
+.story-dialogue strong{display:block;color:#ff364b;font-family:var(--display);font-weight:400;font-size:1.13cqw;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.25cqh}
+.story-dialogue span{display:block}
+.story-footer{position:absolute;left:2.8cqw;right:2.8cqw;bottom:4.3cqh;display:flex;align-items:center;justify-content:space-between;gap:2cqw}
+.story-count{font-size:.75cqw;color:#a3a7ad;letter-spacing:.2em}
+.story-footer button{font-size:1.4cqw;display:flex;align-items:center;gap:.7cqw;text-shadow:0 2px 8px #000}
+.story-next-arrow{font:2cqw Arial,sans-serif;margin-left:.3cqw}
+.story-footer button small{margin:0}
